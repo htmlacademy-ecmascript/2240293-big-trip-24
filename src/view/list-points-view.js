@@ -5,7 +5,7 @@ function createListTemplate() {
 
 }
 
-export default class ListPoints {
+export default class ListPointsView {
   getTemplate() {
     return createListTemplate();
   }
