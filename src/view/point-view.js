@@ -1,9 +1,9 @@
 import {createElement} from '../render.js';
 import {humanizePointDate, humanizePointDuration, capitalizeFirstLetter, FORMATS} from '../utils.js';
-import { OFFERS, DESTINATIONS } from '../const.js';
 
-function createOffersTemplate(id) {
-  const offer = OFFERS.find((item) => item.id === id);
+function createOffersTemplate(e, type, allOffers) {
+  const offerDefault = allOffers.find((item) => item.type === type);
+  const offer = offerDefault.offers.find((item) => item.id === e);
   return `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
@@ -12,31 +12,33 @@ function createOffersTemplate(id) {
     </li>`;
 }
 
-function createPointTemplate(point) {
-  const {type, destination, startDate, endDate, price, offers, isFavorite} = point;
-  const destinationDefault = DESTINATIONS.find((item) => item.id === destination).name;
+function createPointTemplate(point, offers, destinations) {
+  const {type, destination: destinationPoint, dateFrom, dateTo, basePrice, offers: offersPoint, isFavorite} = point;
+  const allOffers = offers;
+  const allDestinations = destinations;
+  const destinationDefault = allDestinations.find((item) => item.id === destinationPoint).name;
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${startDate}">${humanizePointDate(startDate)}</time>
+        <time class="event__date" datetime="${dateFrom}">${humanizePointDate(dateFrom)}</time>
         <div class="event__${type}">
           <img class="event__${type}-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${capitalizeFirstLetter(type)} ${destinationDefault}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${startDate}">${humanizePointDate(startDate, FORMATS.TIME)}</time>
+            <time class="event__start-time" datetime="${dateFrom}">${humanizePointDate(dateFrom, FORMATS.TIME)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${endDate}">${humanizePointDate(endDate, FORMATS.TIME)}</time>
+            <time class="event__end-time" datetime="${dateTo}">${humanizePointDate(dateTo, FORMATS.TIME)}</time>
           </p>
-          <p class="event__duration">${humanizePointDuration(startDate,endDate)}</p>
+          <p class="event__duration">${humanizePointDuration(dateFrom,dateTo)}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          ${offers.map((e) => createOffersTemplate(e)).join('')}
+          ${offersPoint.map((e) => createOffersTemplate(e, type, allOffers)).join('')}
         </ul>
         <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : null}" type="button">
           <span class="visually-hidden">Add to favorite</span>
@@ -52,17 +54,19 @@ function createPointTemplate(point) {
 }
 
 export default class PointView {
-  constructor(point) {
+  constructor(point, allOffers, allDestinations) {
     this.point = point;
+    this.allOffers = allOffers;
+    this.allDestinations = allDestinations;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point);
+  getTemplate(point, allOffers, allDestinations) {
+    return createPointTemplate(point, allOffers, allDestinations);
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createElement(this.getTemplate());
+      this.element = createElement(this.getTemplate(this.point, this.allOffers, this.allDestinations));
     }
 
     return this.element;

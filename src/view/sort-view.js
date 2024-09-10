@@ -1,5 +1,5 @@
 import {createElement} from '../render.js';
-import { SORT__VALUE } from '../const.js';
+import { SORTS__VALUE } from '../const.js';
 import { capitalizeFirstLetter } from '../utils.js';
 
 function createSortItemTemplate(item) {
@@ -12,12 +12,12 @@ function createSortItemTemplate(item) {
 function createSortTemplate() {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      ${SORT__VALUE.map((e)=> createSortItemTemplate(e)).join('')}
+      ${SORTS__VALUE.map((e)=> createSortItemTemplate(e)).join('')}
     </form>`
   );
 }
 
-export default class Sort {
+export default class SortView {
   getTemplate() {
     return createSortTemplate();
   }

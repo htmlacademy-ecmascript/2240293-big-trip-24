@@ -15,13 +15,16 @@ export default class BoardPresenter {
 
   init() {
     this.boardPoints = [...this.pointsModel.getTasks()];
+    this.allOffers = [...this.pointsModel.getOffers()];
+    this.allDestinations = [...this.pointsModel.getDestinations()];
     render(new SortView(), this.boardContainer);
     render(this.listContainer, this.boardContainer);
-    render(new FormPointView(true, false), this.listContainer.getElement(), RenderPosition.AFTERBEGIN);
+    render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.listContainer.getElement(), RenderPosition.AFTERBEGIN);
 
     for (let i = 1; i < this.boardPoints.length; i++) {
-      render(new PointView(this.boardPoints[i]), this.listContainer.getElement());
+      render(new PointView(this.boardPoints[i], this.allOffers, this.allDestinations), this.listContainer.getElement());
     }
+
   }
 }
 

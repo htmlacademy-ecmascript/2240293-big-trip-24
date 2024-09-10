@@ -1,32 +1,32 @@
 import {getRandomArrayElement} from '../utils.js';
-import { TYPES_ITEM, DESTINATIONS } from '../const.js';
+import { getDestinations } from '../const.js';
 
 const mockPoints = [
   {
-    type: getRandomArrayElement(TYPES_ITEM),
-    destination: getRandomArrayElement(DESTINATIONS).id,
-    startDate: '2019-03-18T10:30',
-    endDate: '2019-03-18T11:00',
-    price: '130',
-    offers: ['luggage', 'meal'],
+    type: 'taxi',
+    destination: `${getRandomArrayElement(getDestinations()).id}`,
+    dateFrom: '2019-03-18T10:30',
+    dateTo: '2019-03-18T11:00',
+    basePrice: '130',
+    offers: ['uber'],
     isFavorite: true,
   },
   {
-    type: getRandomArrayElement(TYPES_ITEM),
-    destination: getRandomArrayElement(DESTINATIONS).id,
-    startDate: '2019-03-18T14:30',
-    endDate: '2019-03-18T16:05',
-    price: '30',
-    offers: ['luggage'],
+    type: 'flight',
+    destination: `${getRandomArrayElement(getDestinations()).id}`,
+    dateFrom: '2019-03-18T14:30',
+    dateTo: '2019-03-18T16:05',
+    basePrice: '30',
+    offers: ['luggage', 'comfort'],
     isFavorite: false,
   },
   {
-    type: getRandomArrayElement(TYPES_ITEM),
-    destination: getRandomArrayElement(DESTINATIONS).id,
-    startDate: '2019-03-20T08:25',
-    endDate: '2019-03-20T09:25',
-    price: '40',
-    offers: ['train'],
+    type: 'check-in',
+    destination: `${getRandomArrayElement(getDestinations()).id}`,
+    dateFrom: '2019-03-20T08:25',
+    dateTo: '2019-03-20T09:25',
+    basePrice: '40',
+    offers: [],
     isFavorite: false,
   }
 ];

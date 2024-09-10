@@ -1,5 +1,5 @@
 import {createElement} from '../render.js';
-import { FILTER__VALUE } from '../const.js';
+import { FILTERS__VALUE } from '../const.js';
 
 function createFilterItemTemplate(value) {
   return `<div class="trip-filters__filter">
@@ -11,7 +11,7 @@ function createFilterItemTemplate(value) {
 function createFiltersTemplate() {
   return (
     `<form class="trip-filters" action="#" method="get">
-      ${FILTER__VALUE.map((e)=> createFilterItemTemplate(e)).join('')}
+      ${FILTERS__VALUE.map((e)=> createFilterItemTemplate(e)).join('')}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`
   );
