@@ -2,7 +2,7 @@ import SortView from '../view/sort-view.js';
 import ListPointsView from '../view/list-points-view.js';
 import FormPointView from '../view/form-point-view.js';
 import PointView from '../view/point-view.js';
-import {RenderPosition, render} from '../render.js';
+import {RenderPosition, render} from '../framework/render.js';
 
 
 export default class BoardPresenter {
@@ -19,12 +19,11 @@ export default class BoardPresenter {
     this.allDestinations = [...this.pointsModel.getDestinations()];
     render(new SortView(), this.boardContainer);
     render(this.listContainer, this.boardContainer);
-    render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.listContainer.getElement(), RenderPosition.AFTERBEGIN);
+    render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.listContainer.element, RenderPosition.AFTERBEGIN);
 
     for (let i = 1; i < this.boardPoints.length; i++) {
-      render(new PointView(this.boardPoints[i], this.allOffers, this.allDestinations), this.listContainer.getElement());
+      render(new PointView(this.boardPoints[i], this.allOffers, this.allDestinations), this.listContainer.element);
     }
-
   }
 }
 

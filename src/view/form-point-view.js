@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { capitalizeFirstLetter, FORMATS, humanizePointDate } from '../utils.js';
 
 const BLANK_POINT = {
@@ -121,23 +121,16 @@ function createEventTemplate(point, offers, destinations, edit) {
 }
 
 
-export default class FormPointView {
+export default class FormPointView extends AbstractView{
   constructor({point = BLANK_POINT, allOffers, allDestinations}) {
+    super();
     this.point = point;
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
   }
 
-  getTemplate(point, allOffers, allDestinations) {
-    return createEventTemplate(point, allOffers, allDestinations);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate(this.point, this.allOffers, this.allDestinations));
-    }
-
-    return this.element;
+  get template() {
+    return createEventTemplate(this.point, this.allOffers, this.allDestinations);
   }
   // форма редактирования
 
@@ -146,7 +139,4 @@ export default class FormPointView {
   //   return this.element;
   // }
 
-  removeElement() {
-    this.element = null;
-  }
 }
