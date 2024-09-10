@@ -1,12 +1,12 @@
 import {createElement} from '../render.js';
 
-function createLoadingTemlate() {
+function createLoadingTemplate() {
   return '<p class="trip-events__msg">Loading...</p>';
 }
 
 export default class Loading {
   getTemplate() {
-    return createLoadingTemlate();
+    return createLoadingTemplate();
   }
 
   getElement() {

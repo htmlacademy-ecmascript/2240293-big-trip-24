@@ -1,5 +1,5 @@
 import {createElement} from '../render.js';
-const FILTER__VALUE = ['everything', 'future', 'present', 'past'];
+import { FILTER__VALUE } from '../const.js';
 
 function createFilterItemTemplate(value) {
   return `<div class="trip-filters__filter">
@@ -17,7 +17,7 @@ function createFiltersTemplate() {
   );
 }
 
-export default class Filters {
+export default class FiltersView {
   getTemplate() {
     return createFiltersTemplate();
   }
