@@ -1,6 +1,10 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(duration);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const FORMATS = {
   DATE: 'D MMM',
@@ -27,4 +31,17 @@ function humanizePointDuration(date1, date2) {
   }
 }
 
-export {humanizePointDate, humanizePointDuration, FORMATS};
+function isCompletedPoints(dateTo) {
+  return dateTo && dayjs().isAfter(dayjs(dateTo));
+}
+
+function isCurrentPoints(dateFrom, dateTo) {
+  return dayjs().isSameOrAfter(dayjs(dateFrom)) && dayjs().isSameOrBefore(dayjs(dateTo));
+}
+
+function isPlannedPoints(dateFrom) {
+  return dateFrom && dayjs().isBefore(dayjs(dateFrom));
+}
+
+
+export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints};

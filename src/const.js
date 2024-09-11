@@ -5,7 +5,12 @@ const NO_POINT_MESSAGES = {
   FUTURE: 'There are no future events now'
 };
 
-const FILTERS__VALUE = ['everything', 'future', 'present', 'past'];
+const FILTERS__VALUE = {
+  EVERYTHING: 'everything',
+  PAST: 'past',
+  PRESENT: 'present',
+  FUTURE: 'future'
+};
 
 const SORTS__VALUE = ['day', 'event', 'time', 'price', 'offer'];
 

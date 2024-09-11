@@ -74,9 +74,9 @@ export default class BoardPresenter {
     render(new SortView(), this.#boardContainer);
     render(this.#listContainer, this.#boardContainer);
     // render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.#listContainer.element, RenderPosition.AFTERBEGIN);
-    //оставила что бы использовать для отписовки при нажатии на кнопку Nev Edit
+    //оставила что бы использовать для отрисовки при нажатии на кнопку New event
 
-    for (let i = 1; i < this.#boardPoints.length; i++) {
+    for (let i = 0; i < this.#boardPoints.length; i++) {
       this.#renderPoint(this.#boardPoints[i], this.allOffers, this.allDestinations);
     }
   }
