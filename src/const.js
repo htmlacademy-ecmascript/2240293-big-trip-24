@@ -1,3 +1,10 @@
+const NO_POINT_MESSAGES = {
+  EVERYTHING: 'Click New Event to create your first point',
+  PAST: 'There are no past events now',
+  PRESENT: 'There are no present events now',
+  FUTURE: 'There are no future events now'
+};
+
 const FILTERS__VALUE = ['everything', 'future', 'present', 'past'];
 
 const SORTS__VALUE = ['day', 'event', 'time', 'price', 'offer'];
@@ -190,4 +197,4 @@ function getDestinations() {
   return destinationsMock;
 }
 
-export {FILTERS__VALUE, SORTS__VALUE, getOffers, getDestinations};
+export {NO_POINT_MESSAGES, FILTERS__VALUE, SORTS__VALUE, getOffers, getDestinations};

@@ -1,5 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizePointDate, humanizePointDuration, capitalizeFirstLetter, FORMATS} from '../utils.js';
+import { FORMATS, humanizePointDate, humanizePointDuration } from '../utils/points.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 
 function createOffersTemplate(e, type, allOffers) {
   const offerDefault = allOffers.find((item) => item.type === type);
@@ -54,14 +55,26 @@ function createPointTemplate(point, offers, destinations) {
 }
 
 export default class PointView extends AbstractView{
-  constructor(point, allOffers, allDestinations) {
+  #point = null;
+  #handleEditClick = null;
+
+  constructor({point, allOffers, allDestinations, onEditClick}) {
     super();
-    this.point = point;
+    this.#point = point;
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
 
   get template() {
-    return createPointTemplate(this.point, this.allOffers, this.allDestinations);
+    return createPointTemplate(this.#point, this.allOffers, this.allDestinations);
   }
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

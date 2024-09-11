@@ -1,5 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { capitalizeFirstLetter, FORMATS, humanizePointDate } from '../utils.js';
+import { FORMATS, humanizePointDate } from '../utils/points.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 
 const BLANK_POINT = {
   type: 'flight',
@@ -18,24 +19,24 @@ function createTypeItemTemplate(type) {
     </div>`;
 }
 
-function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers, allDestinations) {
+function createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit) {
   const details = [];
+
   if (offersPoint) {
     const offerDefault = allOffers.find((item) => item.type === type);
-
     details.push(`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offersPoint.map((e) => {
-    const offer = offerDefault.offers.find((item) => item.id === e);
+        ${offerDefault.offers.map((e) => {
+    const offer = offersPoint.find((item) => item === e.id);
     return (`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.value}-1" type="checkbox" name="event-offer-${offer.value}">
-          <label class="event__offer-label" for="event-offer-${offer.value}-1">
-            <span class="event__offer-title">${offer.title}</span>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${e.value}-1" type="checkbox" name="event-offer-${e.value}" ${offer && edit ? 'checked' : false}>
+          <label class="event__offer-label" for="event-offer-${e.value}-1">
+            <span class="event__offer-title">${e.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-basePrice">${offer.prise}</span>
+            <span class="event__offer-basePrice">${e.prise}</span>
           </label>
         </div>`);
   }).join('')}
@@ -43,8 +44,7 @@ function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers, a
     </section>`);
   }
 
-  if (destinationPoint) {
-    const destinationDefault = allDestinations.find((item) => item.id === destinationPoint);
+  if (destinationDefault && (destinationDefault.picture.length > 0 || destinationDefault.description.trim() > 0)) {
     details.push (`
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -65,6 +65,7 @@ function createEventTemplate(point, offers, destinations, edit) {
   const {type, destination: destinationPoint, dateFrom, dateTo, basePrice, offers: offersPoint} = point;
   const allOffers = offers;
   const allDestinations = destinations;
+  const destinationDefault = allDestinations.find((item) => item.id === destinationPoint);
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -88,7 +89,7 @@ function createEventTemplate(point, offers, destinations, edit) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationDefault ? `${destinationDefault.name}` : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
             </datalist>
@@ -114,7 +115,7 @@ function createEventTemplate(point, offers, destinations, edit) {
           <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${createDetailsTemplate(type, offersPoint, destinationPoint, allOffers, allDestinations)}
+          ${createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit)}
         </section>
       </form>
     </li>`;
@@ -122,21 +123,26 @@ function createEventTemplate(point, offers, destinations, edit) {
 
 
 export default class FormPointView extends AbstractView{
-  constructor({point = BLANK_POINT, allOffers, allDestinations}) {
+  #handleFormSubmit = null;
+  constructor({point = BLANK_POINT, allOffers, allDestinations, edit, onFormSubmit}) {
     super();
     this.point = point;
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
+    this.isEdit = edit;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
   }
+
 
   get template() {
-    return createEventTemplate(this.point, this.allOffers, this.allDestinations);
+    return createEventTemplate(this.point, this.allOffers, this.allDestinations, this.isEdit);
   }
-  // форма редактирования
 
-  // editElement() {
-  //   this.element = createElement(this.getTemplate(this.point, true));
-  //   return this.element;
-  // }
-
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

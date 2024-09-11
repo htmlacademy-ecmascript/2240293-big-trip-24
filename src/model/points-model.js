@@ -4,20 +4,20 @@ import { getOffers, getDestinations } from '../const';
 const POINT_COUNT = 4;
 
 export default class PointsModel {
-  allOffers = getOffers();
-  allDestinations = getDestinations();
-  points = Array.from({length: POINT_COUNT}, getRandomPoint);
+  #allOffers = getOffers();
+  #allDestinations = getDestinations();
+  #points = Array.from({length: POINT_COUNT}, getRandomPoint);
 
-  getTasks() {
-    return this.points;
+  get points() {
+    return this.#points;
   }
 
-  getDestinations() {
-    return this.allDestinations;
+  get destinations() {
+    return this.#allDestinations;
   }
 
-  getOffers() {
-    return this.allOffers;
+  get offers() {
+    return this.#allOffers;
   }
 
 }

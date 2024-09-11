@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { SORTS__VALUE } from '../const.js';
-import { capitalizeFirstLetter } from '../utils.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 
 function createSortItemTemplate(item) {
   return `<div class="trip-sort__item  trip-sort__item--${item}">
