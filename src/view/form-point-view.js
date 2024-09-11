@@ -1,14 +1,13 @@
-import {createElement} from '../render.js';
-import { DESTINATIONS, TYPES_ITEM } from '../const.js';
-import { OFFERS } from '../const.js';
-import { capitalizeFirstLetter, FORMATS, humanizePointDate } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { FORMATS, humanizePointDate } from '../utils/points.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 
 const BLANK_POINT = {
   type: 'flight',
   destination: '',
-  startDate: '',
-  endDate: '',
-  price: '0',
+  dateFrom: '',
+  dateTo: '',
+  basePrice: '0',
   offers: ['luggage', 'comfort', 'meal', 'seats', 'train'],
 };
 
@@ -20,22 +19,24 @@ function createTypeItemTemplate(type) {
     </div>`;
 }
 
-function createDetailsTemplate(offers, destination) {
+function createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit) {
   const details = [];
-  if (offers) {
+
+  if (offersPoint) {
+    const offerDefault = allOffers.find((item) => item.type === type);
     details.push(`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offers.map((e) => {
-    const offer = OFFERS.find((item) => item.id === e);
+        ${offerDefault.offers.map((e) => {
+    const offer = offersPoint.find((item) => item === e.id);
     return (`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.value}-1" type="checkbox" name="event-offer-${offer.value}">
-          <label class="event__offer-label" for="event-offer-${offer.value}-1">
-            <span class="event__offer-title">${offer.title}</span>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${e.value}-1" type="checkbox" name="event-offer-${e.value}" ${offer && edit ? 'checked' : false}>
+          <label class="event__offer-label" for="event-offer-${e.value}-1">
+            <span class="event__offer-title">${e.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offer.prise}</span>
+            <span class="event__offer-basePrice">${e.prise}</span>
           </label>
         </div>`);
   }).join('')}
@@ -43,8 +44,7 @@ function createDetailsTemplate(offers, destination) {
     </section>`);
   }
 
-  if (destination) {
-    const destinationDefault = DESTINATIONS.find((item) => item.id === destination);
+  if (destinationDefault && (destinationDefault.picture.length > 0 || destinationDefault.description.trim() > 0)) {
     details.push (`
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -57,12 +57,15 @@ function createDetailsTemplate(offers, destination) {
           </dev>` : ''}
       </section>`);
   }
-  return details;
+  return details.join('');
 }
 
 
-function createEventTemplate(point, edit) {
-  const {type, destination, startDate, endDate, price, offers} = point;
+function createEventTemplate(point, offers, destinations, edit) {
+  const {type, destination: destinationPoint, dateFrom, dateTo, basePrice, offers: offersPoint} = point;
+  const allOffers = offers;
+  const allDestinations = destinations;
+  const destinationDefault = allDestinations.find((item) => item.id === destinationPoint);
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -77,7 +80,7 @@ function createEventTemplate(point, edit) {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${TYPES_ITEM.map((e)=> createTypeItemTemplate(e)).join('')}
+                ${allOffers.map((e) => createTypeItemTemplate(e.type)).join('')}
               </fieldset>
             </div>
           </div>
@@ -86,63 +89,60 @@ function createEventTemplate(point, edit) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationDefault ? `${destinationDefault.name}` : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${DESTINATIONS.map((e)=> `<option value="${e.name}"></option>`).join('')}
+              ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDate(startDate, FORMATS.FORM)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDate(dateFrom, FORMATS.FORM)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDate(endDate, FORMATS.FORM)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDate(dateTo, FORMATS.FORM)}">
           </div>
 
-          <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price-1">
-              <span class="visually-hidden">Price</span>
+          <div class="event__field-group  event__field-group--basePrice">
+            <label class="event__label" for="event-basePrice-1">
+              <span class="visually-hidden">basePrice</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+            <input class="event__input  event__input--basePrice" id="event-basePrice-1" type="text" name="event-basePrice" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${createDetailsTemplate(offers, destination).join('')}
+          ${createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit)}
         </section>
       </form>
     </li>`;
 }
 
 
-export default class FormPointView {
-  constructor({point = BLANK_POINT}) {
+export default class FormPointView extends AbstractView{
+  #handleFormSubmit = null;
+  constructor({point = BLANK_POINT, allOffers, allDestinations, edit, onFormSubmit}) {
+    super();
     this.point = point;
+    this.allOffers = allOffers;
+    this.allDestinations = allDestinations;
+    this.isEdit = edit;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
   }
 
-  getTemplate() {
-    return createEventTemplate(this.point);
+
+  get template() {
+    return createEventTemplate(this.point, this.allOffers, this.allDestinations, this.isEdit);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-  // форма редактирования
-
-  // editElement() {
-  //   this.element = createElement(this.getTemplate(this.point, true));
-  //   return this.element;
-  // }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

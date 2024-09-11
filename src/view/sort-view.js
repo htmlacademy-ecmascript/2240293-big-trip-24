@@ -1,6 +1,6 @@
-import {createElement} from '../render.js';
-import { SORT__VALUE } from '../const.js';
-import { capitalizeFirstLetter } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { SORTS__VALUE } from '../const.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 
 function createSortItemTemplate(item) {
   return `<div class="trip-sort__item  trip-sort__item--${item}">
@@ -12,25 +12,13 @@ function createSortItemTemplate(item) {
 function createSortTemplate() {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      ${SORT__VALUE.map((e)=> createSortItemTemplate(e)).join('')}
+      ${SORTS__VALUE.map((e)=> createSortItemTemplate(e)).join('')}
     </form>`
   );
 }
 
-export default class Sort {
-  getTemplate() {
+export default class SortView extends AbstractView{
+  get template() {
     return createSortTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

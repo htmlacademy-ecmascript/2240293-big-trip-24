@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import { FILTER__VALUE } from '../const.js';
+import { FILTERS__VALUE } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createFilterItemTemplate(value) {
   return `<div class="trip-filters__filter">
@@ -11,26 +11,14 @@ function createFilterItemTemplate(value) {
 function createFiltersTemplate() {
   return (
     `<form class="trip-filters" action="#" method="get">
-      ${FILTER__VALUE.map((e)=> createFilterItemTemplate(e)).join('')}
+      ${FILTERS__VALUE.map((e)=> createFilterItemTemplate(e)).join('')}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`
   );
 }
 
-export default class FiltersView {
-  getTemplate() {
+export default class FiltersView extends AbstractView{
+  get template() {
     return createFiltersTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
