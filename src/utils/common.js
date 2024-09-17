@@ -8,4 +8,8 @@ function capitalizeFirstLetter(text) {
   return textFirstCapitalLetter;
 }
 
-export {getRandomArrayElement, capitalizeFirstLetter};
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export {getRandomArrayElement, capitalizeFirstLetter, updateItem};

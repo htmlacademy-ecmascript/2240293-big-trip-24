@@ -1,10 +1,10 @@
 import SortView from '../view/sort-view.js';
 import ListPointsView from '../view/list-points-view.js';
-import FormPointView from '../view/form-point-view.js';
-import PointView from '../view/point-view.js';
 // import { RenderPosition } from '../framework/render.js';
-import {render, replace} from '../framework/render.js';
+import {render } from '../framework/render.js';
 import NoPointView from '../view/no-point-view.js';
+import PointPresenter from './point-presenter.js';
+import {updateItem} from '../utils/common.js';
 
 
 export default class BoardPresenter {
@@ -12,6 +12,9 @@ export default class BoardPresenter {
   #pointsModel = null;
   #listContainer = new ListPointsView();
   #boardPoints = [];
+  #sortComponent = new SortView();
+  #noPointComponent = new NoPointView();
+  #pointPresenters = new Map();
 
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
@@ -25,61 +28,58 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
-  #renderPoint(point, allOffers, allDestinations) {
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    const pointComponent = new PointView({
-      point,
-      allOffers,
-      allDestinations,
-      onEditClick: () => {
-        replacePointToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
-    });
-
-    const pointEditComponent = new FormPointView({
-      point,
-      allOffers: this.allOffers,
-      allDestinations: this.allDestinations,
-      edit: 'true',
-      onFormSubmit: () => {
-        replaceFormToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
-
-    function replacePointToForm() {
-      replace(pointEditComponent, pointComponent);
-    }
-
-    function replaceFormToPoint() {
-      replace(pointComponent, pointEditComponent);
-    }
-
-    render(pointComponent, this.#listContainer.element);
+  #renderSort() {
+    render(this.#sortComponent, this.#boardContainer);
   }
 
-  #renderBoard() {
-    if (this.#boardPoints.length === 0) {
-      render(new NoPointView(), this.#boardContainer);
-      return;
-    }
-    render(new SortView(), this.#boardContainer);
-    render(this.#listContainer, this.#boardContainer);
-    // render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.#listContainer.element, RenderPosition.AFTERBEGIN);
-    //оставила что бы использовать для отрисовки при нажатии на кнопку New event
+  #renderPoint(point, allOffers, allDestinations) {
+    const pointPresenter = new PointPresenter({
+      pointsListContainer: this.#listContainer.element,
+      onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange
+    });
 
+    pointPresenter.init(point, allOffers, allDestinations);
+    this.#pointPresenters.set(point.id, pointPresenter);
+  }
+
+  #renderPointsList() {
+    render(this.#listContainer, this.#boardContainer);
     for (let i = 0; i < this.#boardPoints.length; i++) {
       this.#renderPoint(this.#boardPoints[i], this.allOffers, this.allDestinations);
     }
   }
+
+  #renderNoPoint() {
+    render(this.#noPointComponent, this.#boardContainer);
+  }
+
+  #renderBoard() {
+    if (this.#boardPoints.length === 0) {
+      this.#renderNoPoint();
+      return;
+    }
+    this.#renderSort();
+    this.#renderPointsList();
+    // render(new FormPointView({allOffers: this.allOffers, allDestinations: this.allDestinations}), this.#listContainer.element, RenderPosition.AFTERBEGIN);
+    //оставила что бы использовать для отрисовки при нажатии на кнопку New event
+  }
+
+  #clearPointsList() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+
+  #handlePointChange = (updatedPoint) => {
+    this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint, this.allOffers, this.allDestinations);
+  };
+
 }
 
 

@@ -19,24 +19,24 @@ function createTypeItemTemplate(type) {
     </div>`;
 }
 
-function createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit) {
+function createDetailsTemplate(type, offers, destinationDefault, allOffers, edit) {
   const details = [];
 
-  if (offersPoint) {
+  if (offers) {
     const offerDefault = allOffers.find((item) => item.type === type);
     details.push(`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
         ${offerDefault.offers.map((e) => {
-    const offer = offersPoint.find((item) => item === e.id);
+    const offer = offers.find((item) => item === e.id);
     return (`
         <div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${e.value}-1" type="checkbox" name="event-offer-${e.value}" ${offer && edit ? 'checked' : false}>
           <label class="event__offer-label" for="event-offer-${e.value}-1">
             <span class="event__offer-title">${e.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-basePrice">${e.prise}</span>
+            <span class="event__offer-basePrice">${e.price}</span>
           </label>
         </div>`);
   }).join('')}
@@ -61,11 +61,10 @@ function createDetailsTemplate(type, offersPoint, destinationDefault, allOffers,
 }
 
 
-function createEventTemplate(point, offers, destinations, edit) {
-  const {type, destination: destinationPoint, dateFrom, dateTo, basePrice, offers: offersPoint} = point;
-  const allOffers = offers;
-  const allDestinations = destinations;
-  const destinationDefault = allDestinations.find((item) => item.id === destinationPoint);
+function createEventTemplate(point, allOffers, allDestinations, edit) {
+  const {type, destination, dateFrom, dateTo, basePrice, offers} = point;
+
+  const destinationDefault = allDestinations.find((item) => item.id === destination);
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -115,7 +114,7 @@ function createEventTemplate(point, offers, destinations, edit) {
           <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${createDetailsTemplate(type, offersPoint, destinationDefault, allOffers, edit)}
+          ${createDetailsTemplate(type, offers, destinationDefault, allOffers, edit)}
         </section>
       </form>
     </li>`;
@@ -124,25 +123,26 @@ function createEventTemplate(point, offers, destinations, edit) {
 
 export default class FormPointView extends AbstractView{
   #handleFormSubmit = null;
+  #point = null;
+
   constructor({point = BLANK_POINT, allOffers, allDestinations, edit, onFormSubmit}) {
     super();
-    this.point = point;
+    this.#point = point;
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
     this.isEdit = edit;
     this.#handleFormSubmit = onFormSubmit;
-
     this.element.querySelector('.event--edit')
       .addEventListener('submit', this.#formSubmitHandler);
   }
 
 
   get template() {
-    return createEventTemplate(this.point, this.allOffers, this.allDestinations, this.isEdit);
+    return createEventTemplate(this.#point, this.allOffers, this.allDestinations, this.isEdit);
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit();
+    this.#handleFormSubmit(this.#point);
   };
 }
