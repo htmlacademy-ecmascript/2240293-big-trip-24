@@ -36,7 +36,7 @@ function createDetailsTemplate(type, offersPoint, destinationDefault, allOffers,
           <label class="event__offer-label" for="event-offer-${e.value}-1">
             <span class="event__offer-title">${e.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-basePrice">${e.prise}</span>
+            <span class="event__offer-basePrice">${e.price}</span>
           </label>
         </div>`);
   }).join('')}

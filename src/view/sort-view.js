@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { SORTS__VALUE } from '../const.js';
+import { SORT_VALUES } from '../const.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 
 function createSortItemTemplate(item) {
@@ -12,7 +12,7 @@ function createSortItemTemplate(item) {
 function createSortTemplate() {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      ${SORTS__VALUE.map((e)=> createSortItemTemplate(e)).join('')}
+      ${SORT_VALUES.map((e)=> createSortItemTemplate(e)).join('')}
     </form>`
   );
 }

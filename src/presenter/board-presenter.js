@@ -48,7 +48,7 @@ export default class BoardPresenter {
       point,
       allOffers: this.allOffers,
       allDestinations: this.allDestinations,
-      edit: 'true',
+      edit: true,
       onFormSubmit: () => {
         replaceFormToPoint();
         document.removeEventListener('keydown', escKeyDownHandler);

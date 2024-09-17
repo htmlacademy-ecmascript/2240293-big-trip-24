@@ -26,9 +26,8 @@ function humanizePointDuration(date1, date2) {
   }
   if (pointDuration.hours() > 0) {
     return `${pointDuration.format('HH[H] mm[M]')}`;
-  }else {
-    return `${pointDuration.format('mm[M]')}`;
   }
+  return `${pointDuration.format('mm[M]')}`;
 }
 
 function isCompletedPoints(dateTo) {

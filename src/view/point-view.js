@@ -9,14 +9,12 @@ function createOffersTemplate(e, type, allOffers) {
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${offer.prise}</span>
+      <span class="event__offer-price">${offer.price}</span>
     </li>`;
 }
 
-function createPointTemplate(point, offers, destinations) {
+function createPointTemplate(point, allOffers, allDestinations) {
   const {type, destination: destinationPoint, dateFrom, dateTo, basePrice, offers: offersPoint, isFavorite} = point;
-  const allOffers = offers;
-  const allDestinations = destinations;
   const destinationDefault = allDestinations.find((item) => item.id === destinationPoint).name;
   return `
     <li class="trip-events__item">
