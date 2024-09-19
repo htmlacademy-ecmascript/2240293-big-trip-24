@@ -6,8 +6,8 @@ const mockPoints = [
   {
     type: 'taxi',
     destination: `${getRandomArrayElement(getDestinations()).id}`,
-    dateFrom: '2024-09-01T10:30',
-    dateTo: '2024-09-18T11:00',
+    dateFrom: '2024-10-18T14:30',
+    dateTo: '2024-10-18T16:05',
     basePrice: '130',
     offers: ['uber'],
     isFavorite: true,
@@ -15,8 +15,8 @@ const mockPoints = [
   {
     type: 'flight',
     destination: `${getRandomArrayElement(getDestinations()).id}`,
-    dateFrom: '2024-10-18T14:30',
-    dateTo: '2024-10-18T16:05',
+    dateFrom: '2024-03-20T08:25',
+    dateTo: '2024-03-20T13:25',
     basePrice: '30',
     offers: ['luggage', 'comfort'],
     isFavorite: false,
@@ -24,11 +24,20 @@ const mockPoints = [
   {
     type: 'check-in',
     destination: `${getRandomArrayElement(getDestinations()).id}`,
-    dateFrom: '2024-03-20T08:25',
-    dateTo: '2024-03-20T08:55',
+    dateFrom: '2024-09-01T10:30',
+    dateTo: '2024-09-18T11:00',
     basePrice: '40',
     offers: [],
     isFavorite: false,
+  },
+  {
+    type: 'drive',
+    destination: `${getRandomArrayElement(getDestinations()).id}`,
+    dateFrom: '2024-07-20T08:25',
+    dateTo: '2024-07-21T12:55',
+    basePrice: '200',
+    offers: ['rent'],
+    isFavorite: true,
   }
 ];
 

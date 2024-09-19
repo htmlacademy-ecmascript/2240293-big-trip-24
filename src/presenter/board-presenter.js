@@ -5,6 +5,7 @@ import {render } from '../framework/render.js';
 import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
 import {updateItem} from '../utils/common.js';
+import { sortPointDate, sortPointPrice, sortPointTime } from '../utils/points.js';
 
 
 export default class BoardPresenter {
@@ -12,23 +13,30 @@ export default class BoardPresenter {
   #pointsModel = null;
   #listContainer = new ListPointsView();
   #boardPoints = [];
-  #sortComponent = new SortView();
+  #sortComponent = null;
   #noPointComponent = new NoPointView();
   #pointPresenters = new Map();
-
+  #currentSortType = null;
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
+    this.#currentSortType = 'day';
   }
 
   init() {
     this.#boardPoints = [...this.#pointsModel.points];
     this.allOffers = [...this.#pointsModel.offers];
     this.allDestinations = [...this.#pointsModel.destinations];
+    this.#boardPoints.sort(sortPointDate);
     this.#renderBoard();
   }
 
   #renderSort() {
+    this.#sortComponent = new SortView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+
     render(this.#sortComponent, this.#boardContainer);
   }
 
@@ -69,6 +77,32 @@ export default class BoardPresenter {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
   }
+
+  #sortPoints = (sortType) => {
+    switch (sortType) {
+      case 'day':
+        this.#boardPoints.sort(sortPointDate);
+        break;
+      case 'time':
+        this.#boardPoints.sort(sortPointTime);
+        break;
+      case 'price':
+        this.#boardPoints.sort(sortPointPrice);
+        break;
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointsList();
+    this.#renderPointsList();
+  };
 
   #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());

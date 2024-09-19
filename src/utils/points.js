@@ -42,5 +42,48 @@ function isPlannedPoints(dateFrom) {
   return dateFrom && dayjs().isBefore(dayjs(dateFrom));
 }
 
+function getWeightForNullDate(pointA, pointB) {
+  if (pointA === null && pointB === null) {
+    return 0;
+  }
 
-export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints};
+  if (pointA === null) {
+    return 1;
+  }
+
+  if (pointB === null) {
+    return -1;
+  }
+
+  return null;
+}
+
+
+function compareParametersPoints(pointA, pointB) {
+  if (pointA < pointB) {
+    return 1;
+  }
+  if (pointA > pointB) {
+    return -1;
+  }
+  return 0;
+}
+
+function sortPointDate(pointA, pointB) {
+  const weight = getWeightForNullDate(pointA.dateFrom, pointB.dateFrom);
+
+  return weight ?? dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+}
+
+function sortPointPrice(pointA, pointB) {
+  return compareParametersPoints(Number(pointA.basePrice), Number(pointB.basePrice));
+}
+
+function sortPointTime(pointA, pointB) {
+  const pointADuration = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const pointBDuration = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  return compareParametersPoints(pointADuration, pointBDuration);
+}
+
+
+export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime};
