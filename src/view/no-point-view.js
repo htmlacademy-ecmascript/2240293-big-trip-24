@@ -9,9 +9,9 @@ function createNoPointTemplate(filterChecked) {
 
 export default class NoPointView extends AbstractView {
   #filterChecked = null;
-  constructor() {
+  constructor(filter) {
     super();
-    // this.#filterChecked = document.querySelector('.trip-filters__filter-input[checked]').value;
+    this.#filterChecked = filter;
   }
 
   get template() {

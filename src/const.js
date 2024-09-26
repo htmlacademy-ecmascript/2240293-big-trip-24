@@ -12,6 +12,13 @@ const FILTERS_VALUES = {
   FUTURE: 'future'
 };
 
-const SORT_VALUES = ['day', 'event', 'time', 'price', 'offer'];
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
+};
 
-export {NO_POINT_MESSAGES, FILTERS_VALUES, SORT_VALUES};
+
+export {NO_POINT_MESSAGES, FILTERS_VALUES, SortType};

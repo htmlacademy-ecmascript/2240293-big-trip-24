@@ -85,5 +85,12 @@ function sortPointTime(pointA, pointB) {
   return compareParametersPoints(pointADuration, pointBDuration);
 }
 
+function toggleOffers(offers, id) {
+  if (offers.includes(id)) {
+    return offers.filter((offer) => offer !== id);
+  }
+  return offers.concat(id);
+}
 
-export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime};
+
+export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime, toggleOffers};
