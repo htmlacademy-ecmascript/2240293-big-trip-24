@@ -2,6 +2,10 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { FORMATS, humanizePointDate, toggleOffers } from '../utils/points.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
+
 const BLANK_POINT = {
   type: 'flight',
   destination: '',
@@ -123,6 +127,8 @@ function createEventTemplate(point = BLANK_POINT, allOffers, allDestinations, ed
 
 export default class FormPointView extends AbstractStatefulView{
   #handleFormSubmit = null;
+  #startDatepicker = null;
+  #endDatepicker = null;
 
   constructor({point, allOffers, allDestinations, onFormSubmit}) {
     super();
@@ -131,7 +137,6 @@ export default class FormPointView extends AbstractStatefulView{
     this.allDestinations = allDestinations;
     this.isEdit = !!point.id;
     this.#handleFormSubmit = onFormSubmit;
-
     this. _restoreHandlers();
   }
 
@@ -172,6 +177,45 @@ export default class FormPointView extends AbstractStatefulView{
     });
   };
 
+  #setStartDatepicker = () => {
+    this.#startDatepicker = flatpickr(
+      this.element.querySelector('[id="event-start-time-1"]'),
+      {
+        dateFormat: 'd-m-y H:i',
+        enableTime: true,
+        maxDate: this._state.dateTo,
+        'time_24hr': true,
+        onChange: this.#dateStartChangeHandler
+      }
+    );
+  };
+
+  #setEndDatepicker = () => {
+    this.#endDatepicker = flatpickr(
+      this.element.querySelector('[id="event-end-time-1"]'),
+      {
+        dateFormat: 'd-m-y H:i',
+        enableTime: true,
+        minDate: this._state.dateFrom,
+        'time_24hr': true,
+        onChange: this.#dateEndChangeHandler
+      }
+    );
+  };
+
+  #dateStartChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #dateEndChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+
   _restoreHandlers() {
     this.element.querySelector('.event--edit')
       .addEventListener('submit', this.#formSubmitHandler);
@@ -181,6 +225,9 @@ export default class FormPointView extends AbstractStatefulView{
       .addEventListener('click', this.#pointTypeClickHandler);
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#pointDestinationClickHandler);
+
+    this.#setStartDatepicker();
+    this.#setEndDatepicker();
   }
 
   static parsePointToState(point) {
@@ -196,5 +243,16 @@ export default class FormPointView extends AbstractStatefulView{
     this.updateElement(
       FormPointView.parsePointToState(point)
     );
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#startDatepicker || this.#endDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#endDatepicker.destroy();
+      this.#startDatepicker = null;
+      this.#endDatepicker = null;
+    }
   }
 }
