@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import { FORMATS, humanizePointDate } from '../utils/points.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import { FORMATS, humanizePointDate, toggleOffers } from '../utils/points.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 
 const BLANK_POINT = {
@@ -19,24 +19,24 @@ function createTypeItemTemplate(type) {
     </div>`;
 }
 
-function createDetailsTemplate(type, offers, destinationDefault, allOffers, edit) {
+function createDetailsTemplate(type, offers, destinationPoint, allOffers, edit) {
   const details = [];
-
   if (offers) {
-    const offerDefault = allOffers.find((item) => item.type === type);
+    const offersTypePoint = allOffers.find((offer) => offer.type === type);
     details.push(`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offerDefault.offers.map((e) => {
-    const offer = offers.find((item) => item === e.id);
+        ${offersTypePoint.offers.map((offer) => {
+    const offerCheckedPoint = offers.find((offerPointId) => offerPointId === offer.id);
+    const isChecked = offerCheckedPoint && edit ? 'checked' : '';
     return (`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${e.value}-1" type="checkbox" name="event-offer-${e.value}" ${offer && edit ? 'checked' : false}>
-          <label class="event__offer-label" for="event-offer-${e.value}-1">
-            <span class="event__offer-title">${e.title}</span>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.value}-1" type="checkbox" name="event-offer-${offer.value}" ${isChecked}>
+          <label class="event__offer-label" for="event-offer-${offer.value}-1" data-id="${offer.id}">
+            <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-basePrice">${e.price}</span>
+            <span class="event__offer-basePrice">${offer.price}</span>
           </label>
         </div>`);
   }).join('')}
@@ -44,15 +44,15 @@ function createDetailsTemplate(type, offers, destinationDefault, allOffers, edit
     </section>`);
   }
 
-  if (destinationDefault && (destinationDefault.picture.length > 0 || destinationDefault.description.trim() > 0)) {
+  if (destinationPoint !== '' && (destinationPoint.picture.length > 0 || destinationPoint.description.trim() > 0)) {
     details.push (`
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        ${destinationDefault.description.trim() === 0 ? '' : `<p class="event__destination-description">${destinationDefault.description}</p>`}
-        ${destinationDefault.picture.length > 0 ?
+        ${destinationPoint.description.trim() === 0 ? '' : `<p class="event__destination-description">${destinationPoint.description}</p>`}
+        ${destinationPoint.picture.length > 0 ?
     `<div class="event__photos-container">
             <div class="event__photos-tape">
-              ${destinationDefault.picture.map((e)=> `<img class="event__photo" src="${e.src}" alt="${e.description}">`).join('')}
+              ${destinationPoint.picture.map((e)=> `<img class="event__photo" src="${e.src}" alt="${e.description}">`).join('')}
             </div>
           </dev>` : ''}
       </section>`);
@@ -61,10 +61,10 @@ function createDetailsTemplate(type, offers, destinationDefault, allOffers, edit
 }
 
 
-function createEventTemplate(point, allOffers, allDestinations, edit) {
+function createEventTemplate(point = BLANK_POINT, allOffers, allDestinations, edit) {
   const {type, destination, dateFrom, dateTo, basePrice, offers} = point;
+  const destinationPoint = destination !== '' ? allDestinations.find((item) => item.id === destination) : '' ;
 
-  const destinationDefault = allDestinations.find((item) => item.id === destination);
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -88,7 +88,7 @@ function createEventTemplate(point, allOffers, allDestinations, edit) {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationDefault ? `${destinationDefault.name}` : ''}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationPoint ? `${destinationPoint.name}` : ''}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
             </datalist>
@@ -114,35 +114,87 @@ function createEventTemplate(point, allOffers, allDestinations, edit) {
           <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${createDetailsTemplate(type, offers, destinationDefault, allOffers, edit)}
+          ${createDetailsTemplate(type, offers, destinationPoint, allOffers, edit)}
         </section>
       </form>
     </li>`;
 }
 
 
-export default class FormPointView extends AbstractView{
+export default class FormPointView extends AbstractStatefulView{
   #handleFormSubmit = null;
-  #point = null;
 
-  constructor({point = BLANK_POINT, allOffers, allDestinations, edit, onFormSubmit}) {
+  constructor({point, allOffers, allDestinations, onFormSubmit}) {
     super();
-    this.#point = point;
+    this._setState(FormPointView.parsePointToState(point));
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
-    this.isEdit = edit;
+    this.isEdit = !!point.id;
     this.#handleFormSubmit = onFormSubmit;
-    this.element.querySelector('.event--edit')
-      .addEventListener('submit', this.#formSubmitHandler);
+
+    this. _restoreHandlers();
   }
 
 
   get template() {
-    return createEventTemplate(this.#point, this.allOffers, this.allDestinations, this.isEdit);
+    return createEventTemplate(this._state, this.allOffers, this.allDestinations, this.isEdit);
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(FormPointView.parseStateToPoint(this._state));
   };
+
+  #pointOfferClickHandler = (evt) => {
+    evt.preventDefault();
+    if(evt.target.closest('.event__offer-label')) {
+      const offerActive = evt.target.closest('.event__offer-label').dataset.id;
+      const offers = [...this._state.offers];
+      this.updateElement({
+        offers: toggleOffers(offers, offerActive),
+      });
+    }
+  };
+
+  #pointTypeClickHandler = (evt) => {
+    evt.preventDefault();
+    const newType = evt.target.control.value;
+    this.updateElement({
+      type: newType,
+    });
+  };
+
+  #pointDestinationClickHandler = (evt) => {
+    evt.preventDefault();
+    const newDestination = this.allDestinations.find((destinations) => evt.target.value === destinations.name).id;
+    this.updateElement({
+      destination: newDestination,
+    });
+  };
+
+  _restoreHandlers() {
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__available-offers')
+      .addEventListener('click', this.#pointOfferClickHandler);
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#pointTypeClickHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#pointDestinationClickHandler);
+  }
+
+  static parsePointToState(point) {
+    return {...point};
+  }
+
+  static parseStateToPoint(state) {
+    const point = {...state};
+    return point;
+  }
+
+  reset(point) {
+    this.updateElement(
+      FormPointView.parsePointToState(point)
+    );
+  }
 }

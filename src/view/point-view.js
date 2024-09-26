@@ -20,8 +20,8 @@ function createPointTemplate(point, allOffers, allDestinations) {
     <li class="trip-events__item">
       <div class="event">
         <time class="event__date" datetime="${dateFrom}">${humanizePointDate(dateFrom)}</time>
-        <div class="event__${type}">
-          <img class="event__${type}-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
+        <div class="event__type">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${capitalizeFirstLetter(type)} ${destinationDefault}</h3>
         <div class="event__schedule">
