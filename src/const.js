@@ -5,7 +5,7 @@ const NO_POINT_MESSAGES = {
   FUTURE: 'There are no future events now'
 };
 
-const FILTERS_VALUES = {
+const FiltersValues = {
   EVERYTHING: 'everything',
   PAST: 'past',
   PRESENT: 'present',
@@ -21,4 +21,4 @@ const SortType = {
 };
 
 
-export {NO_POINT_MESSAGES, FILTERS_VALUES, SortType};
+export {NO_POINT_MESSAGES, FiltersValues, SortType};

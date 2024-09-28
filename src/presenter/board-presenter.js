@@ -2,10 +2,10 @@ import SortView from '../view/sort-view.js';
 import ListPointsView from '../view/list-points-view.js';
 import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 import {updateItem} from '../utils/common.js';
 import { sortPointDate, sortPointPrice, sortPointTime } from '../utils/points.js';
-import { SortType, FILTERS_VALUES } from '../const.js';
+import { SortType, FiltersValues } from '../const.js';
 
 
 export default class BoardPresenter {
@@ -68,7 +68,7 @@ export default class BoardPresenter {
 
   #renderBoard() {
     if (this.#boardPoints.length === 0) {
-      this.#renderNoPoint(FILTERS_VALUES.EVERYTHING);
+      this.#renderNoPoint(FiltersValues.EVERYTHING);
       return;
     }
     this.#renderSort(this.#currentSortType);
@@ -100,6 +100,8 @@ export default class BoardPresenter {
     if (this.#currentSortType === sortType) {
       return;
     }
+    remove(this.#sortComponent);
+    this.#renderSort(sortType);
     this.#sortPoints(sortType);
     this.#clearPointsList();
     this.#renderPointsList();

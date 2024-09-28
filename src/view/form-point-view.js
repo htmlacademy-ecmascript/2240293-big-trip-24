@@ -23,17 +23,17 @@ function createTypeItemTemplate(type) {
     </div>`;
 }
 
-function createDetailsTemplate(type, offers, destinationPoint, allOffers, edit) {
+function createDetailsTemplate(type, offers, destinationPoint, allOffers) {
   const details = [];
   if (offers) {
-    const offersTypePoint = allOffers.find((offer) => offer.type === type);
+    const offersByTypePoint = allOffers.find((offer) => offer.type === type)?.offers;
     details.push(`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offersTypePoint.offers.map((offer) => {
-    const offerCheckedPoint = offers.find((offerPointId) => offerPointId === offer.id);
-    const isChecked = offerCheckedPoint && edit ? 'checked' : '';
+        ${offersByTypePoint?.map((offer) => {
+    const checkedOfferPoint = offers.find((offerPointId) => offerPointId === offer.id);
+    const isChecked = checkedOfferPoint ? 'checked' : '';
     return (`
         <div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.value}-1" type="checkbox" name="event-offer-${offer.value}" ${isChecked}>
@@ -43,7 +43,7 @@ function createDetailsTemplate(type, offers, destinationPoint, allOffers, edit) 
             <span class="event__offer-basePrice">${offer.price}</span>
           </label>
         </div>`);
-  }).join('')}
+  }).join('') || ''}
       </div>
     </section>`);
   }
@@ -118,7 +118,7 @@ function createEventTemplate(point = BLANK_POINT, allOffers, allDestinations, ed
           <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
         </header>
         <section class="event__details">
-          ${createDetailsTemplate(type, offers, destinationPoint, allOffers, edit)}
+          ${createDetailsTemplate(type, offers, destinationPoint, allOffers)}
         </section>
       </form>
     </li>`;
@@ -152,8 +152,9 @@ export default class FormPointView extends AbstractStatefulView{
 
   #pointOfferClickHandler = (evt) => {
     evt.preventDefault();
-    if(evt.target.closest('.event__offer-label')) {
-      const offerActive = evt.target.closest('.event__offer-label').dataset.id;
+    const labelElement = evt.target.closest('.event__offer-label');
+    if(labelElement) {
+      const offerActive = labelElement.dataset.id;
       const offers = [...this._state.offers];
       this.updateElement({
         offers: toggleOffers(offers, offerActive),
@@ -183,9 +184,10 @@ export default class FormPointView extends AbstractStatefulView{
       {
         dateFormat: 'd-m-y H:i',
         enableTime: true,
-        maxDate: this._state.dateTo,
+        defaultDate: new Date(this._state.dateFrom),
+        maxDate:  new Date(this._state.dateTo),
         'time_24hr': true,
-        onChange: this.#dateStartChangeHandler
+        onClose: this.#dateStartChangeHandler
       }
     );
   };
@@ -196,23 +198,24 @@ export default class FormPointView extends AbstractStatefulView{
       {
         dateFormat: 'd-m-y H:i',
         enableTime: true,
-        minDate: this._state.dateFrom,
+        defaultDate: new Date(this._state.dateTo),
+        minDate:  new Date(this._state.dateFrom),
         'time_24hr': true,
-        onChange: this.#dateEndChangeHandler
+        onClose: this.#dateEndChangeHandler
       }
     );
   };
 
   #dateStartChangeHandler = ([userDate]) => {
-    this.updateElement({
-      dateFrom: userDate,
-    });
+    this.updateElement(
+      {dateFrom: userDate,}
+    );
   };
 
   #dateEndChangeHandler = ([userDate]) => {
-    this.updateElement({
-      dateTo: userDate,
-    });
+    this.updateElement(
+      { dateTo: userDate,}
+    );
   };
 
 
@@ -235,8 +238,7 @@ export default class FormPointView extends AbstractStatefulView{
   }
 
   static parseStateToPoint(state) {
-    const point = {...state};
-    return point;
+    return {...state};
   }
 
   reset(point) {

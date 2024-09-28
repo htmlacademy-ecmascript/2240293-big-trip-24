@@ -89,7 +89,7 @@ function toggleOffers(offers, id) {
   if (offers.includes(id)) {
     return offers.filter((offer) => offer !== id);
   }
-  return offers.concat(id);
+  return [...offers, id];
 }
 
 
