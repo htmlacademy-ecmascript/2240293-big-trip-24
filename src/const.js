@@ -5,7 +5,7 @@ const NO_POINT_MESSAGES = {
   FUTURE: 'There are no future events now'
 };
 
-const FILTERS_VALUES = {
+const FiltersValues = {
   EVERYTHING: 'everything',
   PAST: 'past',
   PRESENT: 'present',
@@ -20,5 +20,17 @@ const SortType = {
   OFFER: 'offer'
 };
 
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
 
-export {NO_POINT_MESSAGES, FILTERS_VALUES, SortType};
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+
+export {NO_POINT_MESSAGES, FiltersValues, SortType, UserAction, UpdateType};

@@ -89,8 +89,12 @@ function toggleOffers(offers, id) {
   if (offers.includes(id)) {
     return offers.filter((offer) => offer !== id);
   }
-  return offers.concat(id);
+  return [...offers, id];
+}
+
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
 
 
-export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime, toggleOffers};
+export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime, toggleOffers, isDatesEqual};

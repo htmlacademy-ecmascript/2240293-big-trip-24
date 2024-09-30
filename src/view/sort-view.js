@@ -23,10 +23,12 @@ function createSortTemplate(sortType) {
 export default class SortView extends AbstractView{
   #handleSortTypeChange = null;
   #sortType = null;
+
   constructor({onSortTypeChange, sortType}) {
     super();
     this.#sortType = sortType;
     this. #handleSortTypeChange = onSortTypeChange;
+
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
   }
 
@@ -38,6 +40,7 @@ export default class SortView extends AbstractView{
     if (!evt.target.classList.contains('trip-sort__input')) {
       return;
     }
+    evt.preventDefault();
     this.#handleSortTypeChange(evt.target.dataset.sortType);
   };
 }
