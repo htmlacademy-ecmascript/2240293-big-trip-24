@@ -5,7 +5,7 @@ function createListTemplate() {
 
 }
 
-export default class ListPointsView extends AbstractView{
+export default class ListPointsView extends AbstractView {
   get template() {
     return createListTemplate();
   }
