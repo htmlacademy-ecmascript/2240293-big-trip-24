@@ -48,15 +48,15 @@ function createDetailsTemplate(type, offers, destinationPoint, allOffers) {
     </section>`);
   }
 
-  if (destinationPoint !== '' && (destinationPoint.picture.length > 0 || destinationPoint.description.trim() > 0)) {
+  if (destinationPoint !== '' && (destinationPoint.pictures.length > 0 || destinationPoint.description.trim() > 0)) {
     details.push (`
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         ${destinationPoint.description.trim() === 0 ? '' : `<p class="event__destination-description">${destinationPoint.description}</p>`}
-        ${destinationPoint.picture.length > 0 ?
+        ${destinationPoint.pictures.length > 0 ?
     `<div class="event__photos-container">
             <div class="event__photos-tape">
-              ${destinationPoint.picture.map((e)=> `<img class="event__photo" src="${e.src}" alt="${e.description}">`).join('')}
+              ${destinationPoint.pictures.map((e)=> `<img class="event__photo" src="${e.src}" alt="${e.description}">`).join('')}
             </div>
           </dev>` : ''}
       </section>`);
@@ -202,8 +202,8 @@ export default class FormPointView extends AbstractStatefulView{
       {
         dateFormat: 'd-m-y H:i',
         enableTime: true,
-        defaultDate: new Date(this._state.dateFrom),
-        maxDate:  new Date(this._state.dateTo),
+        defaultDate: this._state.dateFrom,
+        maxDate:  this._state.dateTo,
         'time_24hr': true,
         onClose: this.#dateStartChangeHandler
       }
@@ -216,8 +216,8 @@ export default class FormPointView extends AbstractStatefulView{
       {
         dateFormat: 'd-m-y H:i',
         enableTime: true,
-        defaultDate: new Date(this._state.dateTo),
-        minDate:  new Date(this._state.dateFrom),
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
         'time_24hr': true,
         onClose: this.#dateEndChangeHandler
       }
