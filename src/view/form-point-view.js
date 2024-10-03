@@ -1,9 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { FORMATS, humanizePointDate, toggleOffers } from '../utils/points.js';
-import { capitalizeFirstLetter } from '../utils/common.js';
 import he from 'he';
 import flatpickr from 'flatpickr';
-
+import { FORMATS, humanizePointDate, toggleOffers } from '../utils/points.js';
+import { capitalizeFirstLetter } from '../utils/common.js';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
@@ -16,8 +15,7 @@ const BLANK_POINT = {
 };
 
 function createTypeItemTemplate(type) {
-  return `
-    <div class="event__type-item">
+  return `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
     </div>`;
@@ -65,63 +63,88 @@ function createDetailsTemplate(type, offers, destinationPoint, allOffers) {
 }
 
 
-function createEventTemplate(point = BLANK_POINT, allOffers, allDestinations, edit) {
-  const {type, destination, dateFrom, dateTo, basePrice, offers} = point;
+function createEventTemplate(point, allOffers, allDestinations, edit) {
+  const {type, destination, dateFrom, dateTo, basePrice, offers, isDisabled, isSaving, isDeleting} = point;
   const destinationPoint = destination !== '' ? allDestinations.find((item) => item.id === destination) : '' ;
+  const textButtonReset = isDeleting ? 'deleting...' : 'delete';
+  return `<li class="trip-events__item">
+            <form class="event event--edit" action="#" method="post">
+              <header class="event__header">
+                <div class="event__type-wrapper">
+                  <label class="event__type  event__type-btn" for="event-type-toggle-1">
+                    <span class="visually-hidden">Choose event type</span>
+                    <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+                  </label>
+                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
-  return `
-    <li class="trip-events__item">
-      <form class="event event--edit" action="#" method="post">
-        <header class="event__header">
-          <div class="event__type-wrapper">
-            <label class="event__type  event__type-btn" for="event-type-toggle-1">
-              <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
-            </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                  <div class="event__type-list">
+                    <fieldset class="event__type-group">
+                      <legend class="visually-hidden">Event type</legend>
+                      ${allOffers.map((e) => createTypeItemTemplate(e.type)).join('')}
+                    </fieldset>
+                  </div>
+                </div>
 
-            <div class="event__type-list">
-              <fieldset class="event__type-group">
-                <legend class="visually-hidden">Event type</legend>
-                ${allOffers.map((e) => createTypeItemTemplate(e.type)).join('')}
-              </fieldset>
-            </div>
-          </div>
+                <div class="event__field-group  event__field-group--destination">
+                  <label class="event__label  event__type-output" for="event-destination-1">
+                    ${type}
+                  </label>
 
-          <div class="event__field-group  event__field-group--destination">
-            <label class="event__label  event__type-output" for="event-destination-1">
-              ${type}
-            </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destinationPoint ? `${destinationPoint.name}` : '')}" list="destination-list-1" required>
-            <datalist id="destination-list-1">
-              ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
-            </datalist>
-          </div>
+                  <input class="event__input  event__input--destination"
+                  id="event-destination-1"
+                  type="text"
+                  name="event-destination"
+                  value="${he.encode(destinationPoint ? `${destinationPoint.name}` : '')}"
+                  list="destination-list-1"
+                  ${isDisabled ? 'disabled' : ''} required>
+                  <datalist id="destination-list-1">
+                    ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
+                  </datalist>
+                </div>
 
-          <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDate(dateFrom, FORMATS.FORM)}" required>
-            &mdash;
-            <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDate(dateTo, FORMATS.FORM)}" required>
-          </div>
+                <div class="event__field-group  event__field-group--time">
+                  <label class="visually-hidden" for="event-start-time-1">From</label>
 
-          <div class="event__field-group  event__field-group--basePrice">
-            <label class="event__label" for="event-basePrice-1">
-              <span class="visually-hidden">basePrice</span>
-              &euro;
-            </label>
-            <input class="event__input  event__input--basePrice" id="event-basePrice-1" type="text" name="event-basePrice" value="${basePrice}"  onkeyup="this.value = this.value.replace(/[^0-9]/g,'');" required>
-          </div>
+                  <input class="event__input  event__input--time"
+                  id="event-start-time-1"
+                  type="text"
+                  name="event-start-time"
+                  value="${humanizePointDate(dateFrom, FORMATS.FORM)}"
+                  ${isDisabled ? 'disabled' : ''} required>
+                  &mdash;
+                  <label class="visually-hidden" for="event-end-time-1">To</label>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${edit ? 'Delete' : 'Cancel'}</button>
-        </header>
-        <section class="event__details">
-          ${createDetailsTemplate(type, offers, destinationPoint, allOffers)}
-        </section>
-      </form>
-    </li>`;
+                  <input class="event__input  event__input--time"
+                  id="event-end-time-1"
+                  type="text"
+                  name="event-end-time"
+                  value="${humanizePointDate(dateTo, FORMATS.FORM)}"
+                  ${isDisabled ? 'disabled' : ''} required>
+                </div>
+
+                <div class="event__field-group  event__field-group--basePrice">
+                  <label class="event__label" for="event-basePrice-1">
+                    <span class="visually-hidden">basePrice</span>
+                    &euro;
+                  </label>
+
+                  <input class="event__input  event__input--basePrice"
+                  id="event-basePrice-1"
+                  type="text"
+                  name="event-basePrice"
+                  value="${basePrice}"
+                  onkeyup="this.value = this.value.replace(/[^0-9]/g,'');"
+                  ${isDisabled ? 'disabled' : ''} required>
+                </div>
+
+                <button class="event__save-btn  btn  btn--blue" type="submit" ${isDeleting ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+                <button class="event__reset-btn" type="reset" ${isSaving ? 'disabled' : ''}>${edit ? textButtonReset : 'Cancel'}</button>
+              </header>
+              <section class="event__details">
+                ${createDetailsTemplate(type, offers, destinationPoint, allOffers)}
+              </section>
+            </form>
+          </li>`;
 }
 
 
@@ -133,19 +156,83 @@ export default class FormPointView extends AbstractStatefulView{
 
   constructor({point = BLANK_POINT, allOffers, allDestinations, onFormSubmit, onDeleteClick}) {
     super();
+
     this._setState(FormPointView.parsePointToState(point));
     this.allOffers = allOffers;
     this.allDestinations = allDestinations;
     this.isEdit = !!point.id;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleDeleteClick = onDeleteClick;
-    this. _restoreHandlers();
-  }
 
+    this._restoreHandlers();
+  }
 
   get template() {
     return createEventTemplate(this._state, this.allOffers, this.allDestinations, this.isEdit);
   }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__available-offers')
+      .addEventListener('click', this.#pointOfferClickHandler);
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#pointTypeClickHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#pointDestinationChangeHandler);
+    this.element.querySelector('.event__input--basePrice')
+      .addEventListener('change', this.#pointPriceChangeHandler);
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#formDeleteClickHandler);
+
+    this.#setStartDatepicker();
+    this.#setEndDatepicker();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#startDatepicker || this.#endDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#endDatepicker.destroy();
+      this.#startDatepicker = null;
+      this.#endDatepicker = null;
+    }
+  }
+
+  reset(point) {
+    this.updateElement(
+      FormPointView.parsePointToState(point)
+    );
+  }
+
+  #setStartDatepicker = () => {
+    this.#startDatepicker = flatpickr(
+      this.element.querySelector('[id="event-start-time-1"]'),
+      {
+        dateFormat: 'd-m-y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateFrom,
+        maxDate:  this._state.dateTo,
+        'time_24hr': true,
+        onClose: this.#dateStartChangeHandler
+      }
+    );
+  };
+
+  #setEndDatepicker = () => {
+    this.#endDatepicker = flatpickr(
+      this.element.querySelector('[id="event-end-time-1"]'),
+      {
+        dateFormat: 'd-m-y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        'time_24hr': true,
+        onClose: this.#dateEndChangeHandler
+      }
+    );
+  };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
@@ -196,34 +283,6 @@ export default class FormPointView extends AbstractStatefulView{
     });
   };
 
-  #setStartDatepicker = () => {
-    this.#startDatepicker = flatpickr(
-      this.element.querySelector('[id="event-start-time-1"]'),
-      {
-        dateFormat: 'd-m-y H:i',
-        enableTime: true,
-        defaultDate: this._state.dateFrom,
-        maxDate:  this._state.dateTo,
-        'time_24hr': true,
-        onClose: this.#dateStartChangeHandler
-      }
-    );
-  };
-
-  #setEndDatepicker = () => {
-    this.#endDatepicker = flatpickr(
-      this.element.querySelector('[id="event-end-time-1"]'),
-      {
-        dateFormat: 'd-m-y H:i',
-        enableTime: true,
-        defaultDate: this._state.dateTo,
-        minDate: this._state.dateFrom,
-        'time_24hr': true,
-        onClose: this.#dateEndChangeHandler
-      }
-    );
-  };
-
   #dateStartChangeHandler = ([userDate]) => {
     this.updateElement(
       {dateFrom: userDate,}
@@ -236,47 +295,20 @@ export default class FormPointView extends AbstractStatefulView{
     );
   };
 
-
-  _restoreHandlers() {
-    this.element.querySelector('.event--edit')
-      .addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__available-offers')
-      .addEventListener('click', this.#pointOfferClickHandler);
-    this.element.querySelector('.event__type-group')
-      .addEventListener('click', this.#pointTypeClickHandler);
-    this.element.querySelector('.event__input--destination')
-      .addEventListener('change', this.#pointDestinationChangeHandler);
-    this.element.querySelector('.event__input--basePrice')
-      .addEventListener('change', this.#pointPriceChangeHandler);
-    this.element.querySelector('.event__reset-btn')
-      .addEventListener('click', this.#formDeleteClickHandler);
-
-    this.#setStartDatepicker();
-    this.#setEndDatepicker();
-  }
-
   static parsePointToState(point) {
-    return {...point};
+    return {...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    };
   }
 
   static parseStateToPoint(state) {
-    return {...state};
-  }
+    const point = {...state};
 
-  reset(point) {
-    this.updateElement(
-      FormPointView.parsePointToState(point)
-    );
-  }
-
-  removeElement() {
-    super.removeElement();
-
-    if (this.#startDatepicker || this.#endDatepicker) {
-      this.#startDatepicker.destroy();
-      this.#endDatepicker.destroy();
-      this.#startDatepicker = null;
-      this.#endDatepicker = null;
-    }
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+    return point;
   }
 }

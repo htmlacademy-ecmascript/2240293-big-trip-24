@@ -33,5 +33,4 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-
 export {NO_POINT_MESSAGES, FiltersValues, SortType, UserAction, UpdateType};

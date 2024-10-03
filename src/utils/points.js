@@ -58,7 +58,6 @@ function getWeightForNullDate(pointA, pointB) {
   return null;
 }
 
-
 function compareParametersPoints(pointA, pointB) {
   if (pointA < pointB) {
     return 1;
@@ -82,6 +81,7 @@ function sortPointPrice(pointA, pointB) {
 function sortPointTime(pointA, pointB) {
   const pointADuration = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const pointBDuration = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+
   return compareParametersPoints(pointADuration, pointBDuration);
 }
 
@@ -95,6 +95,5 @@ function toggleOffers(offers, id) {
 function isDatesEqual(dateA, dateB) {
   return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
-
 
 export {humanizePointDate, humanizePointDuration, FORMATS, isCompletedPoints, isCurrentPoints, isPlannedPoints, sortPointDate, sortPointPrice, sortPointTime, toggleOffers, isDatesEqual};
