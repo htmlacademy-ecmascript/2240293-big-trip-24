@@ -1,4 +1,4 @@
-const NO_POINT_MESSAGES = {
+const NoPointMessages = {
   EVERYTHING: 'Click New Event to create your first point',
   PAST: 'There are no past events now',
   PRESENT: 'There are no present events now',
@@ -33,5 +33,4 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-
-export {NO_POINT_MESSAGES, FiltersValues, SortType, UserAction, UpdateType};
+export {NoPointMessages, FiltersValues, SortType, UserAction, UpdateType};

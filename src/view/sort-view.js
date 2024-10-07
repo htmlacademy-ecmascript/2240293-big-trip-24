@@ -13,11 +13,10 @@ function createSortItemTemplate(item, sortType) {
 
 function createSortTemplate(sortType) {
   const sortValues = Object.values(SortType);
-  return (
-    `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      ${sortValues.map((item)=> createSortItemTemplate(item, sortType)).join('')}
-    </form>`
-  );
+
+  return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
+            ${sortValues.map((item)=> createSortItemTemplate(item, sortType)).join('')}
+          </form>`;
 }
 
 export default class SortView extends AbstractView{
@@ -26,6 +25,7 @@ export default class SortView extends AbstractView{
 
   constructor({onSortTypeChange, sortType}) {
     super();
+
     this.#sortType = sortType;
     this. #handleSortTypeChange = onSortTypeChange;
 
@@ -40,6 +40,7 @@ export default class SortView extends AbstractView{
     if (!evt.target.classList.contains('trip-sort__input')) {
       return;
     }
+
     evt.preventDefault();
     this.#handleSortTypeChange(evt.target.dataset.sortType);
   };

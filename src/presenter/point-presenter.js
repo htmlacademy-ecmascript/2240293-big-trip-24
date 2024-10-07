@@ -1,6 +1,6 @@
-import {render, replace, remove} from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import FormPointView from '../view/form-point-view.js';
+import {render, replace, remove} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 import { isDatesEqual } from '../utils/points.js';
 
@@ -59,7 +59,8 @@ export default class PointPresenter {
     }
 
     if ((this.#mode === Mode.EDITING)) {
-      replace(this.#pointEditComponent, prevPointEditComponent);
+      replace(this.#pointComponent, prevPointEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -70,6 +71,41 @@ export default class PointPresenter {
     if (this.#mode !== Mode.DEFAULT) {
       this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToPoint();
+    }
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
     }
   }
 
@@ -111,7 +147,6 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    this.#replaceFormToPoint();
   };
 
   #handleDeleteClick = (point) => {

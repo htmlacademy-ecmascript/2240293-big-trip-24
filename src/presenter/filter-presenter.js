@@ -1,8 +1,7 @@
-import {render, replace, remove} from '../framework/render.js';
 import FiltersView from '../view/filters-view.js';
-import {filter} from '../utils/filter.js';
-import {FiltersValues, UpdateType} from '../const.js';
-
+import { render, replace, remove } from '../framework/render.js';
+import { Filter } from '../utils/filter.js';
+import { FiltersValues, UpdateType } from '../const.js';
 
 export default class FilterPresenter {
   #filterContainer = null;
@@ -15,15 +14,17 @@ export default class FilterPresenter {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
+
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get filters() {
     const points = this.#pointsModel.points;
+
     return Object.values(FiltersValues).map((type) => ({
       type,
-      points: filter[type](points)
+      points: Filter[type](points)
     }));
   }
 
