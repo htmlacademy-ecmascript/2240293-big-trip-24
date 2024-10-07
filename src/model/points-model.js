@@ -74,7 +74,7 @@ export default class PointsModel extends Observable{
 
       this._notify(updateType);
     } catch(err) {
-      throw new Error('Can\'t delete task');
+      throw new Error('Can\'t delete point');
     }
   }
 

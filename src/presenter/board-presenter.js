@@ -95,8 +95,8 @@ export default class BoardPresenter {
     this.#renderPointsList();
   }
 
-  #renderNoPoint() {
-    this.#noPointComponent = new NoPointView({filterType: this.#filterType});
+  #renderNoPoint(filterType) {
+    this.#noPointComponent = new NoPointView({filterType: filterType});
     render(this.#noPointComponent, this.#boardContainer);
   }
 

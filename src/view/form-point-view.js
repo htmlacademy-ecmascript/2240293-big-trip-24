@@ -12,6 +12,7 @@ const BLANK_POINT = {
   dateTo: '',
   basePrice: '0',
   offers: [],
+  isFavorite: false,
 };
 
 function createTypeItemTemplate(type) {

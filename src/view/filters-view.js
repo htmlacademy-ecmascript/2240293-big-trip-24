@@ -37,6 +37,9 @@ export default class FiltersView extends AbstractView{
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
     const inputElement = evt.target.control;
     this.#handleFilterTypeChange(inputElement.value);
   };
