@@ -13,28 +13,17 @@ export default class TripInfoPresenter {
     this.#pointsModel.addObserver(this.#handleModelEvent);
   }
 
-  get points() {
-    return this.#pointsModel.points;
-  }
-
-  get destinations() {
-    return this.#pointsModel.destinations;
-  }
-
-  get offers() {
-    return this.#pointsModel.offers;
-  }
-
   init() {
     this.#renderTripInfo();
   }
 
   #renderTripInfo() {
-    const points = this.points;
-    const destinations = this.destinations;
-    const offers = this.offers;
     remove(this.#tripInfoComponent);
-    this.#tripInfoComponent = new TripInfoView({points, destinations, offers});
+    this.#tripInfoComponent = new TripInfoView({
+      points: this.#pointsModel.points,
+      destinations: this.#pointsModel.destinations,
+      offers: this.#pointsModel.offers
+    });
     render(this.#tripInfoComponent, this.#headerContainer, RenderPosition.AFTERBEGIN);
   }
 

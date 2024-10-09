@@ -3,6 +3,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 function createFilterItemTemplate({type, points}, currentFilter) {
   const isChecked = type === currentFilter ? 'checked' : '';
   const isDisabled = points.length > 0 ? '' : 'disabled';
+
   return `<div class="trip-filters__filter">
             <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${isChecked} ${isDisabled}>
             <label class="trip-filters__filter-label" for="filter-${type}">${type.toUpperCase()}</label>

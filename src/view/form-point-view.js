@@ -68,6 +68,7 @@ function createEventTemplate(point, allOffers, allDestinations, edit) {
   const {type, destination, dateFrom, dateTo, basePrice, offers, isDisabled, isSaving, isDeleting} = point;
   const destinationPoint = destination !== '' ? allDestinations.find((item) => item.id === destination) : '' ;
   const textButtonReset = isDeleting ? 'deleting...' : 'delete';
+
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
               <header class="event__header">

@@ -1,23 +1,28 @@
 import AbstractView from '../framework/view/abstract-view';
 import { humanizePointDate } from '../utils/points';
+const MAX_DESTINATIONS_TITLE = 3;
 
-function createTripInfoTemplate(points, destinations, offers) {
-  const destinationsPoint = points.map((point) => destinations.find((destination) => destination.id === point.destination).name);
-  const title = destinationsPoint.length > 3 ? `${destinationsPoint[0]}-...-${destinationsPoint[destinationsPoint.length - 1]}` : `${destinationsPoint.join('-')}`;
-  const duration = `${humanizePointDate(points[0].dateFrom)} - ${humanizePointDate(points[points.length - 1].dateTo)}`;
+function getTripPrice(points, allOffers) {
   let basePricePoints = 0;
   let offersPrice = 0;
 
   points.forEach((point) => {
     basePricePoints = basePricePoints + Number(point.basePrice);
-  });
 
-  points.map((point) => {
-    const offersPoint = offers.find((offer) => offer.type === point.type).offers;
+    const offersPoint = allOffers.find((offer) => offer.type === point.type).offers;
     point.offers.forEach((offerId) => {
-      offersPrice = offersPrice + Number(offersPoint.find((offerPoint) => offerPoint.id === offerId).price);
+      offersPrice = offersPrice + offersPoint.find((offerPoint) => offerPoint.id === offerId).price;
     });
   });
+
+  return basePricePoints + offersPrice;
+}
+
+function createTripInfoTemplate(points, allDestinations, allOffers) {
+  const destinationsPoint = points.map((point) => allDestinations.find((destination) => destination.id === point.destination).name);
+  const title = destinationsPoint.length > MAX_DESTINATIONS_TITLE ? `${destinationsPoint[0]}-...-${destinationsPoint[destinationsPoint.length - 1]}` : `${destinationsPoint.join('-')}`;
+  const duration = `${humanizePointDate(points[0].dateFrom)} - ${humanizePointDate(points[points.length - 1].dateTo)}`;
+  const tripPrice = getTripPrice(points, allOffers);
 
   return `<section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
@@ -27,13 +32,13 @@ function createTripInfoTemplate(points, destinations, offers) {
             </div>
 
             <p class="trip-info__cost">
-              Total: &euro;&nbsp;<span class="trip-info__cost-value">${basePricePoints + offersPrice}</span>
+              Total: &euro;&nbsp;<span class="trip-info__cost-value">${tripPrice}</span>
             </p>
           </section>`;
 }
 
 export default class TripInfoView extends AbstractView{
-  #points = null;
+  #points = [];
 
   constructor({points, destinations, offers}) {
     super();
