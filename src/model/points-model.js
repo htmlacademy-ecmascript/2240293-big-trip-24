@@ -1,7 +1,6 @@
 import Observable from '../framework/observable.js';
 import {UpdateType} from '../const.js';
 
-
 export default class PointsModel extends Observable{
   #allOffers = [];
   #allDestinations = [];

@@ -15,7 +15,7 @@ function createOffersTemplate(e, type, allOffers) {
 
 function createPointTemplate(point, allOffers, allDestinations) {
   const {type, destination, dateFrom, dateTo, basePrice, offers, isFavorite} = point;
-  const destinationDefault = allDestinations.find((item) => item.id === destination).name;
+  const destinationPoint = allDestinations.find((item) => item.id === destination).name;
 
   return `<li class="trip-events__item">
             <div class="event">
@@ -23,7 +23,7 @@ function createPointTemplate(point, allOffers, allDestinations) {
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
               </div>
-              <h3 class="event__title">${capitalizeFirstLetter(type)} ${destinationDefault}</h3>
+              <h3 class="event__title">${capitalizeFirstLetter(type)} ${destinationPoint}</h3>
               <div class="event__schedule">
                 <p class="event__time">
                   <time class="event__start-time" datetime="${dateFrom}">${humanizePointDate(dateFrom, FORMATS.TIME)}</time>

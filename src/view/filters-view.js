@@ -1,10 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFilterItemTemplate({type}, currentFilter) {
+function createFilterItemTemplate({type, points}, currentFilter) {
   const isChecked = type === currentFilter ? 'checked' : '';
+  const isDisabled = points.length > 0 ? '' : 'disabled';
 
   return `<div class="trip-filters__filter">
-            <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${isChecked}>
+            <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${isChecked} ${isDisabled}>
             <label class="trip-filters__filter-label" for="filter-${type}">${type.toUpperCase()}</label>
           </div>`;
 }
@@ -27,7 +28,6 @@ export default class FiltersView extends AbstractView{
     this.#filters = filters;
     this.#currentFilter = currentFilterType;
     this.#handleFilterTypeChange = onFilterTypeChange;
-
     this.element.addEventListener('click', this.#filterTypeChangeHandler);
   }
 
@@ -37,7 +37,7 @@ export default class FiltersView extends AbstractView{
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    if (evt.target.tagName !== 'LABEL') {
+    if (evt.target.tagName !== 'LABEL' || evt.target.control.hasAttribute('disabled')) {
       return;
     }
     const inputElement = evt.target.control;

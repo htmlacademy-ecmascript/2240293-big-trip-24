@@ -1,5 +1,6 @@
 import BoardPresenter from './presenter/board-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
+import TripInfoPresenter from './presenter/trip-info-presenter.js';
 import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
 import NewPointButtonView from './view/new-point-button-view.js';
@@ -33,6 +34,11 @@ const filterPresenter = new FilterPresenter({
   pointsModel: pointsModel
 });
 
+const tripInfoPresenter = new TripInfoPresenter({
+  pointsModel: pointsModel,
+  header: header
+});
+
 const newPointButtonComponent = new NewPointButtonView({
   onClick: handleNewPointButtonClick
 });
@@ -50,5 +56,6 @@ boardPresenter.init();
 pointsModel.init()
   .finally(() => {
     filterPresenter.init();
-    render(newPointButtonComponent, header, RenderPosition.AFTEREND);
+    tripInfoPresenter.init();
+    render(newPointButtonComponent, header, RenderPosition.BEFOREEND);
   });
