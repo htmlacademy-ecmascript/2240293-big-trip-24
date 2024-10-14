@@ -1,15 +1,18 @@
+const NOT_LOADED = 'not_loaded';
+
 const NoPointMessages = {
   EVERYTHING: 'Click New Event to create your first point',
   PAST: 'There are no past events now',
   PRESENT: 'There are no present events now',
-  FUTURE: 'There are no future events now'
+  FUTURE: 'There are no future events now',
+  NOT_LOADED: 'Failed to load latest route information'
 };
 
 const FiltersValues = {
   EVERYTHING: 'everything',
-  PAST: 'past',
+  FUTURE: 'future',
   PRESENT: 'present',
-  FUTURE: 'future'
+  PAST: 'past'
 };
 
 const SortType = {
@@ -33,4 +36,4 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-export {NoPointMessages, FiltersValues, SortType, UserAction, UpdateType};
+export {NoPointMessages, FiltersValues, SortType, UserAction, UpdateType, NOT_LOADED};

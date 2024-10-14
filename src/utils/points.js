@@ -7,7 +7,8 @@ dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 
 const FORMATS = {
-  DATE: 'D MMM',
+  DATE: 'MMM D',
+  DATE_TRIP_INFO: 'D MMM',
   TIME: 'HH:mm',
   FORM: 'DD/MM/YY HH:mm'
 };
@@ -21,6 +22,10 @@ function humanizePointDuration(date1, date2) {
   const endDate = dayjs(date2);
   const pointDuration = dayjs.duration(endDate.diff(startDate));
 
+  if (pointDuration.months() > 0 || pointDuration.years() > 0) {
+    const days = Math.floor(pointDuration.asDays());
+    return `${pointDuration.format(`${days}[D] HH[H] mm[M]`)}`;
+  }
   if (pointDuration.days() > 0) {
     return `${pointDuration.format('DD[D] HH[H] mm[M]')}`;
   }

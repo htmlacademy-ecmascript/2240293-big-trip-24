@@ -56,6 +56,7 @@ boardPresenter.init();
 pointsModel.init()
   .finally(() => {
     filterPresenter.init();
-    tripInfoPresenter.init();
     render(newPointButtonComponent, header, RenderPosition.BEFOREEND);
+    tripInfoPresenter.init();
   });
+

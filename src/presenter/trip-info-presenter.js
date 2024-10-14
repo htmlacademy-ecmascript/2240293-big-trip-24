@@ -14,11 +14,21 @@ export default class TripInfoPresenter {
   }
 
   init() {
+    if (this.#pointsModel.points.length === 0) {
+      if (this.#tripInfoComponent !== null) {
+        this.#removeTripIfoComponent();
+      }
+      return;
+    }
+
     this.#renderTripInfo();
   }
 
   #renderTripInfo() {
-    remove(this.#tripInfoComponent);
+    if (this.#tripInfoComponent !== null) {
+      this.#removeTripIfoComponent();
+    }
+
     this.#tripInfoComponent = new TripInfoView({
       points: this.#pointsModel.points,
       destinations: this.#pointsModel.destinations,
@@ -26,6 +36,11 @@ export default class TripInfoPresenter {
     });
     render(this.#tripInfoComponent, this.#headerContainer, RenderPosition.AFTERBEGIN);
   }
+
+  #removeTripIfoComponent = () => {
+    remove(this.#tripInfoComponent);
+    this.#tripInfoComponent = null;
+  };
 
   #handleModelEvent = () => {
     this.init();

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizePointDate } from '../utils/points';
+import { humanizePointDate, FORMATS } from '../utils/points';
 const MAX_DESTINATIONS_TITLE = 3;
 
 function getTripPrice(points, allOffers) {
@@ -19,9 +19,13 @@ function getTripPrice(points, allOffers) {
 }
 
 function createTripInfoTemplate(points, allDestinations, allOffers) {
+  if(points.length === 0){
+    return;
+  }
+
   const destinationsPoint = points.map((point) => allDestinations.find((destination) => destination.id === point.destination).name);
   const title = destinationsPoint.length > MAX_DESTINATIONS_TITLE ? `${destinationsPoint[0]}-...-${destinationsPoint[destinationsPoint.length - 1]}` : `${destinationsPoint.join('-')}`;
-  const duration = `${humanizePointDate(points[0].dateFrom)} - ${humanizePointDate(points[points.length - 1].dateTo)}`;
+  const duration = `${humanizePointDate(points[0].dateFrom, FORMATS.DATE_TRIP_INFO)} - ${humanizePointDate(points[points.length - 1].dateTo, FORMATS.DATE_TRIP_INFO)}`;
   const tripPrice = getTripPrice(points, allOffers);
 
   return `<section class="trip-main__trip-info  trip-info">
