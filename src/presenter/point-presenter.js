@@ -78,7 +78,6 @@ export default class PointPresenter {
   setSaving() {
     if (this.#mode === Mode.EDITING) {
       this.#pointEditComponent.updateElement({
-        isDisabled: true,
         isSaving: true,
       });
     }
@@ -92,7 +91,6 @@ export default class PointPresenter {
 
     const resetFormState = () => {
       this.#pointEditComponent.updateElement({
-        isDisabled: false,
         isSaving: false,
         isDeleting: false,
       });
@@ -103,7 +101,6 @@ export default class PointPresenter {
   setDeleting() {
     if (this.#mode === Mode.EDITING) {
       this.#pointEditComponent.updateElement({
-        isDisabled: true,
         isDeleting: true,
       });
     }
