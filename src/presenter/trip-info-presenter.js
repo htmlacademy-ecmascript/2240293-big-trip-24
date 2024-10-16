@@ -16,7 +16,7 @@ export default class TripInfoPresenter {
   init() {
     if (this.#pointsModel.points.length === 0) {
       if (this.#tripInfoComponent !== null) {
-        this.#removeTripIfoComponent();
+        this.#removeTripInfoComponent();
       }
       return;
     }
@@ -26,7 +26,7 @@ export default class TripInfoPresenter {
 
   #renderTripInfo() {
     if (this.#tripInfoComponent !== null) {
-      this.#removeTripIfoComponent();
+      this.#removeTripInfoComponent();
     }
 
     this.#tripInfoComponent = new TripInfoView({
@@ -37,7 +37,7 @@ export default class TripInfoPresenter {
     render(this.#tripInfoComponent, this.#headerContainer, RenderPosition.AFTERBEGIN);
   }
 
-  #removeTripIfoComponent = () => {
+  #removeTripInfoComponent = () => {
     remove(this.#tripInfoComponent);
     this.#tripInfoComponent = null;
   };

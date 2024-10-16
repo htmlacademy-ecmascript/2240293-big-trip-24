@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import he from 'he';
 import flatpickr from 'flatpickr';
-import { FORMATS, humanizePointDate, toggleOffers } from '../utils/points.js';
+import { Formats, humanizePointDate, toggleOffers } from '../utils/points.js';
 import { capitalizeFirstLetter } from '../utils/common.js';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -16,18 +16,15 @@ const BLANK_POINT = {
 };
 
 function createTypeItemTemplate(type) {
-  return `<div class="event__type-item">
+  return `
+    <div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
     </div>`;
 }
 
-function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers) {
-  const details = [];
-  const offersByTypePoint = allOffers.find((offer) => offer.type === type)?.offers;
-
-  if (offersByTypePoint.length > 0) {
-    details.push(`
+function createOffersTemplate(offersByTypePoint, offersPoint) {
+  return `
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
@@ -46,10 +43,11 @@ function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers) {
         </div>`);
   }).join('') || ''}
       </div>
-    </section>`);
-  }
-  if (destinationPoint !== '' && (destinationPoint.pictures.length > 0 || destinationPoint.description !== '')) {
-    details.push (`
+    </section>`;
+}
+
+function createDestinationTemplate(destinationPoint) {
+  return `
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         ${destinationPoint.description !== '' ? `<p class="event__destination-description">${destinationPoint.description}</p>` : ''}
@@ -59,100 +57,110 @@ function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers) {
               ${destinationPoint.pictures.map((e)=> `<img class="event__photo" src="${e.src}" alt="${e.description}">`).join('')}
             </div>
           </dev>` : ''}
-      </section>`);
+      </section>`;
+}
+
+function createDetailsTemplate(type, offersPoint, destinationPoint, allOffers) {
+  const details = [];
+  const offersByTypePoint = allOffers.find((offer) => offer.type === type)?.offers;
+
+  if (offersByTypePoint.length > 0) {
+    details.push(createOffersTemplate(offersByTypePoint, offersPoint));
+  }
+  if (destinationPoint !== '' && (destinationPoint.pictures.length > 0 || destinationPoint.description !== '')) {
+    details.push(createDestinationTemplate(destinationPoint));
   }
   return details.join('');
 }
-
 
 function createEventTemplate(point, allOffers, allDestinations, edit) {
   const {type, destination, dateFrom, dateTo, basePrice, offers, isSaving, isDeleting} = point;
   const destinationPoint = destination !== '' ? allDestinations.find((item) => item.id === destination) : '' ;
   const textButtonReset = isDeleting ? 'deleting...' : 'delete';
 
-  return `<li class="trip-events__item">
-            <form class="event event--edit" action="#" method="post">
-              <header class="event__header">
-                <div class="event__type-wrapper">
-                  <label class="event__type  event__type-btn" for="event-type-toggle-1">
-                    <span class="visually-hidden">Choose event type</span>
-                    <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
-                  </label>
-                  <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+  return `
+    <li class="trip-events__item">
+      <form class="event event--edit" action="#" method="post">
+        <header class="event__header">
+          <div class="event__type-wrapper">
+            <label class="event__type  event__type-btn" for="event-type-toggle-1">
+              <span class="visually-hidden">Choose event type</span>
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+            </label>
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-                  <div class="event__type-list">
-                    <fieldset class="event__type-group">
-                      <legend class="visually-hidden">Event type</legend>
-                      ${allOffers.map((e) => createTypeItemTemplate(e.type)).join('')}
-                    </fieldset>
-                  </div>
-                </div>
+            <div class="event__type-list">
+              <fieldset class="event__type-group">
+                <legend class="visually-hidden">Event type</legend>
+                ${allOffers.map((e) => createTypeItemTemplate(e.type)).join('')}
+              </fieldset>
+            </div>
+          </div>
 
-                <div class="event__field-group  event__field-group--destination">
-                  <label class="event__label  event__type-output" for="event-destination-1">
-                    ${type}
-                  </label>
+          <div class="event__field-group  event__field-group--destination">
+            <label class="event__label  event__type-output" for="event-destination-1">
+              ${type}
+            </label>
 
-                  <input class="event__input  event__input--destination"
-                  id="event-destination-1"
-                  type="text"
-                  name="event-destination"
-                  value="${he.encode(destinationPoint ? `${destinationPoint.name}` : '')}"
-                  list="destination-list-1"
-                  required>
-                  <datalist id="destination-list-1">
-                    ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
-                  </datalist>
-                </div>
+            <input class="event__input  event__input--destination"
+            id="event-destination-1"
+            type="text"
+            name="event-destination"
+            value="${he.encode(destinationPoint ? `${destinationPoint.name}` : '')}"
+            list="destination-list-1"
+            required>
+            <datalist id="destination-list-1">
+              ${allDestinations.map((e) => `<option value="${e.name}"></option>`).join('')}
+            </datalist>
+          </div>
 
-                <div class="event__field-group  event__field-group--time">
-                  <label class="visually-hidden" for="event-start-time-1">From</label>
+          <div class="event__field-group  event__field-group--time">
+            <label class="visually-hidden" for="event-start-time-1">From</label>
 
-                  <input class="event__input  event__input--time"
-                  id="event-start-time-1"
-                  type="text"
-                  name="event-start-time"
-                  value="${humanizePointDate(dateFrom, FORMATS.FORM)}"
-                  required>
-                  &mdash;
-                  <label class="visually-hidden" for="event-end-time-1">To</label>
+            <input class="event__input  event__input--time"
+            id="event-start-time-1"
+            type="text"
+            name="event-start-time"
+            value="${humanizePointDate(dateFrom, Formats.FORM)}"
+            required>
+            &mdash;
+            <label class="visually-hidden" for="event-end-time-1">To</label>
 
-                  <input class="event__input  event__input--time"
-                  id="event-end-time-1"
-                  type="text"
-                  name="event-end-time"
-                  value="${humanizePointDate(dateTo, FORMATS.FORM)}"
-                  required>
-                </div>
+            <input class="event__input  event__input--time"
+            id="event-end-time-1"
+            type="text"
+            name="event-end-time"
+            value="${humanizePointDate(dateTo, Formats.FORM)}"
+            required>
+          </div>
 
-                <div class="event__field-group  event__field-group--price">
-                  <label class="event__label" for="event-basePrice-1">
-                    <span class="visually-hidden">basePrice</span>
-                    &euro;
-                  </label>
+          <div class="event__field-group  event__field-group--price">
+            <label class="event__label" for="event-basePrice-1">
+              <span class="visually-hidden">basePrice</span>
+              &euro;
+            </label>
 
-                  <input class="event__input  event__input--price"
-                  id="event-basePrice-1"
-                  type="text"
-                  name="event-basePrice"
-                  value="${basePrice}"
-                  onkeyup="this.value = this.value.replace(/[^0-9]/g,'');"
-                  required>
-                </div>
+            <input class="event__input  event__input--price"
+            id="event-basePrice-1"
+            type="text"
+            name="event-basePrice"
+            value="${basePrice}"
+            onkeyup="this.value = this.value.replace(/[^0-9]/g,'');"
+            required>
+          </div>
 
-                <button class="event__save-btn  btn  btn--blue" type="submit">${isSaving ? 'Saving...' : 'Save'}</button>
-                <button class="event__reset-btn" type="reset">${edit ? textButtonReset : 'Cancel'}</button>
-                <button class="event__rollup-btn" type="button">
-                  <span class="visually-hidden">Open event</span>
-                </button>
-              </header>
-              <section class="event__details">
-                ${createDetailsTemplate(type, offers, destinationPoint, allOffers)}
-              </section>
-            </form>
-          </li>`;
+          <button class="event__save-btn  btn  btn--blue" type="submit">${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__reset-btn" type="reset">${edit ? textButtonReset : 'Cancel'}</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
+        </header>
+        <section class="event__details">
+          ${createDetailsTemplate(type, offers, destinationPoint, allOffers)}
+        </section>
+      </form>
+    </li>`;
 }
-
 
 export default class FormPointView extends AbstractStatefulView{
   #handleFormSubmit = null;
