@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { humanizePointDate } from '../utils/points';
+import { humanizePointDate, Formats } from '../utils/points';
 const MAX_DESTINATIONS_TITLE = 3;
 
 function getTripPrice(points, allOffers) {
@@ -8,8 +8,8 @@ function getTripPrice(points, allOffers) {
 
   points.forEach((point) => {
     basePricePoints = basePricePoints + Number(point.basePrice);
-
     const offersPoint = allOffers.find((offer) => offer.type === point.type).offers;
+
     point.offers.forEach((offerId) => {
       offersPrice = offersPrice + offersPoint.find((offerPoint) => offerPoint.id === offerId).price;
     });
@@ -19,22 +19,29 @@ function getTripPrice(points, allOffers) {
 }
 
 function createTripInfoTemplate(points, allDestinations, allOffers) {
+  if(points.length === 0) {
+    return '';
+  }
+
   const destinationsPoint = points.map((point) => allDestinations.find((destination) => destination.id === point.destination).name);
-  const title = destinationsPoint.length > MAX_DESTINATIONS_TITLE ? `${destinationsPoint[0]}-...-${destinationsPoint[destinationsPoint.length - 1]}` : `${destinationsPoint.join('-')}`;
-  const duration = `${humanizePointDate(points[0].dateFrom)} - ${humanizePointDate(points[points.length - 1].dateTo)}`;
+  const title = destinationsPoint.length > MAX_DESTINATIONS_TITLE ?
+    `${destinationsPoint[0]}-...-${destinationsPoint[destinationsPoint.length - 1]}` :
+    `${destinationsPoint.join('-')}`;
+  const duration = `${humanizePointDate(points[0].dateFrom, Formats.DATE_TRIP_INFO)} - ${humanizePointDate(points[points.length - 1].dateTo, Formats.DATE_TRIP_INFO)}`;
   const tripPrice = getTripPrice(points, allOffers);
 
-  return `<section class="trip-main__trip-info  trip-info">
-            <div class="trip-info__main">
-              <h1 class="trip-info__title">${title}</h1>
+  return `
+    <section class="trip-main__trip-info  trip-info">
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">${title}</h1>
 
-              <p class="trip-info__dates">${duration}</p>
-            </div>
+        <p class="trip-info__dates">${duration}</p>
+      </div>
 
-            <p class="trip-info__cost">
-              Total: &euro;&nbsp;<span class="trip-info__cost-value">${tripPrice}</span>
-            </p>
-          </section>`;
+      <p class="trip-info__cost">
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${tripPrice}</span>
+      </p>
+    </section>`;
 }
 
 export default class TripInfoView extends AbstractView{

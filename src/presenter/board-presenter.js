@@ -8,7 +8,7 @@ import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import { Filter } from '../utils/filter.js';
 import { render, remove } from '../framework/render.js';
 import { sortPointDate, sortPointPrice, sortPointTime } from '../utils/points.js';
-import { SortType, UpdateType, UserAction, FiltersValues } from '../const.js';
+import { SortType, UpdateType, UserAction, FiltersValues, NOT_LOADED } from '../const.js';
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -45,8 +45,6 @@ export default class BoardPresenter {
   }
 
   get points() {
-    this.#filterType = this.#filterModel.filter;
-
     const points = this.#pointsModel.points;
     const filteredPoints = Filter[this.#filterType](points);
 
@@ -74,6 +72,16 @@ export default class BoardPresenter {
   createPoint() {
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FiltersValues.EVERYTHING);
+
+    if (this.#newPointPresenter === null) {
+      this.#renderNewPoint();
+    }
+
+    if (this.#noPointComponent) {
+      remove(this.#noPointComponent);
+      this.#noPointComponent = null;
+      render(this.#listContainer, this.#boardContainer);
+    }
     this.#newPointPresenter.init();
   }
 
@@ -83,10 +91,14 @@ export default class BoardPresenter {
       return;
     }
 
-    const filterType = this.#filterModel.filter;
+    if(!this.#pointsModel.isLoaded) {
+      this.#filterType = NOT_LOADED;
+      this.#renderNoPoint();
+      return;
+    }
 
     if (this.points.length === 0) {
-      this.#renderNoPoint(filterType);
+      this.#renderNoPoint();
       return;
     }
 
@@ -95,8 +107,8 @@ export default class BoardPresenter {
     this.#renderPointsList();
   }
 
-  #renderNoPoint(filterType) {
-    this.#noPointComponent = new NoPointView({filterType: filterType});
+  #renderNoPoint() {
+    this.#noPointComponent = new NoPointView({filterType: this.#filterType});
     render(this.#noPointComponent, this.#boardContainer);
   }
 
@@ -138,12 +150,13 @@ export default class BoardPresenter {
       allDestinations: this.destinations,
       pointListContainer: this.#listContainer.element,
       onDataChange: this.#handleViewAction,
-      onDestroy: this.onNewPointDestroy
+      onDestroy: this.onNewPointDestroy,
+      filterModel: this.#filterModel
     });
   }
 
   #clearBoard({resetSortType = false} = {}) {
-    this.#newPointPresenter.destroy();
+    this.#newPointPresenter?.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
 
@@ -179,7 +192,6 @@ export default class BoardPresenter {
 
   #handleViewAction = async (actionType, updateType, update) => {
     this.#uiBlocker.block();
-
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointPresenters.get(update.id).setSaving();
@@ -211,6 +223,8 @@ export default class BoardPresenter {
   };
 
   #handleModelEvent = (updateType, point) => {
+    this.#filterType = this.#filterModel.filter;
+
     switch (updateType) {
       case UpdateType.PATCH:
         this.#pointPresenters.get(point.id).init(point, this.offers, this.destinations);

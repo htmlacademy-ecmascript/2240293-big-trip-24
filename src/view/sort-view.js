@@ -5,18 +5,21 @@ import { capitalizeFirstLetter } from '../utils/common.js';
 function createSortItemTemplate(item, sortType) {
   const isChecked = (item === sortType ? 'checked' : '');
   const isDisabled = (item === 'event' || item === 'offer' ? 'disabled' : '');
-  return `<div class="trip-sort__item  trip-sort__item--${item}">
-            <input id="sort-${item}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${item}" ${isChecked} ${isDisabled} data-sort-type="${item}">
-            <label class="trip-sort__btn" for="sort-${item}" >${capitalizeFirstLetter(item)}</label>
-          </div>`;
+
+  return `
+    <div class="trip-sort__item  trip-sort__item--${item}">
+      <input id="sort-${item}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${item}" ${isChecked} ${isDisabled} data-sort-type="${item}">
+      <label class="trip-sort__btn" for="sort-${item}" >${capitalizeFirstLetter(item)}</label>
+    </div>`;
 }
 
 function createSortTemplate(sortType) {
   const sortValues = Object.values(SortType);
 
-  return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-            ${sortValues.map((item)=> createSortItemTemplate(item, sortType)).join('')}
-          </form>`;
+  return `
+    <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
+      ${sortValues.map((item)=> createSortItemTemplate(item, sortType)).join('')}
+    </form>`;
 }
 
 export default class SortView extends AbstractView{
