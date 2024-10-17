@@ -142,9 +142,11 @@ function createEventTemplate(point, allOffers, allDestinations, edit) {
 
             <input class="event__input  event__input--price"
             id="event-basePrice-1"
-            type="text"
+            type="number"
             name="event-basePrice"
             value="${basePrice}"
+            min="1"
+            max="100000"
             onkeyup="this.value = this.value.replace(/[^0-9]/g,'');"
             required>
           </div>
